@@ -1,0 +1,28 @@
+{
+  "$schema": "./plugin-tiers.schema.json",
+  "note": "单一真源：任何插件档位判断都必须读这里，不要在别处再抄一份清单。改档位只改这个文件。",
+  "tiers": {
+    "infrastructure": [
+      "dsh-better-sidebar"
+    ],
+    "preview": [
+      "omnimux",
+      "omnimux-assets",
+      "omnimux-clip",
+      "omnimux-forms",
+      "omnimux-inspiration",
+      "omnimux-market",
+      "omnimux-products",
+      "omnimux-workflow"
+    ],
+    "beta": [
+      "omnimux-accounts",
+      "omnimux-analytics",
+      "omnimux-publish",
+      "omnimux-video"
+    ],
+    "retired": [
+      "omnimux-automation"
+    ]
+  }
+}

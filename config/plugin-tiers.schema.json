@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OmniMux plugin release tiers",
+  "description": "The single source of truth for which plugins ship by default. Every consumer (preinstall bundles, market index, plugin repo lifecycle) reads this file instead of keeping its own list.",
+  "type": "object",
+  "required": ["tiers"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "note": { "type": "string" },
+    "tiers": {
+      "type": "object",
+      "required": ["infrastructure", "preview", "beta", "retired"],
+      "additionalProperties": false,
+      "properties": {
+        "infrastructure": {
+          "type": "array",
+          "description": "Always preinstalled and never marketable. These are the services every other plugin registers against (the sidebar), so removing one breaks the rest: it must not be expressible as an optional choice.",
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "uniqueItems": true
+        },
+        "preview": {
+          "type": "array",
+          "description": "Preinstalled in the shipped app and listed in the plugin market.",
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "uniqueItems": true
+        },
+        "beta": {
+          "type": "array",
+          "description": "Internal testing. Not preinstalled, not listed in the market; installable only by an explicit user action.",
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "uniqueItems": true
+        },
+        "retired": {
+          "type": "array",
+          "description": "No longer shipped. Kept only so a stale reference fails loudly instead of silently reappearing.",
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
