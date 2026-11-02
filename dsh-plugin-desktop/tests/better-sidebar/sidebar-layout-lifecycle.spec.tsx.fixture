@@ -1,0 +1,201 @@
+/**
+ * Regression fixture for the pinned dsh-better-sidebar source.
+ *
+ * Copy this file into that package's `tests/` directory before running
+ * Vitest. The relative imports then resolve against the real Sidebar source.
+ */
+// @vitest-environment jsdom
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createElement } from 'react'
+import { createRoot, type Root } from 'react-dom/client'
+import { act } from 'react-dom/test-utils'
+
+;(globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true
+
+import { Sidebar } from '../src/client/Sidebar.tsx'
+import { createBetterSidebarService } from '../src/client/service.ts'
+import {
+  createSidebarStore,
+  setBottomHeight,
+  setWidth,
+  toggleBottomPanel,
+  type SidebarStore,
+} from '../src/client/state.ts'
+
+class FakeWebSocket {
+  onmessage: ((event: { data: unknown }) => void) | null = null
+  onclose: (() => void) | null = null
+  onerror: (() => void) | null = null
+  close = (): void => {}
+  constructor(_url: string) {}
+}
+
+interface MountedSidebar {
+  container: HTMLDivElement
+  store: SidebarStore
+  unmount: () => void
+}
+
+function mountSidebar(): MountedSidebar {
+  vi.stubGlobal('WebSocket', FakeWebSocket)
+  const container = document.createElement('div')
+  document.body.append(container)
+  const store = createSidebarStore()
+  const service = createBetterSidebarService(store)
+  store.setPrefs({ ...store.getPrefs(), openByDefault: true })
+  store.setSession('layout-lifecycle')
+
+  const localeSnapshot = { active: 'en' }
+  const sessionsSnapshot = {
+    current: 'layout-lifecycle',
+    byId: { 'layout-lifecycle': { cwd: '/tmp' } },
+  }
+  const ctx = {
+    locale: { subscribe: () => () => {}, getSnapshot: () => localeSnapshot },
+    sessions: { list: { subscribe: () => () => {}, getSnapshot: () => sessionsSnapshot } },
+    betterSidebar: service,
+  }
+  const root: Root = createRoot(container)
+  act(() => { root.render(createElement(Sidebar, { ctx: ctx as never, store })) })
+
+  return {
+    container,
+    store,
+    unmount: () => {
+      act(() => { root.unmount() })
+      container.remove()
+    },
+  }
+}
+
+/** Install the pointer-capture surface used by Sidebar but absent in jsdom. */
+function installPointerCapture(): () => void {
+  const prototype = HTMLElement.prototype
+  const names = ['setPointerCapture', 'hasPointerCapture', 'releasePointerCapture'] as const
+  const previous = Object.fromEntries(names.map(name => [name, Object.getOwnPropertyDescriptor(prototype, name)]))
+  const captured = new WeakSet<HTMLElement>()
+  Object.defineProperties(prototype, {
+    setPointerCapture: {
+      configurable: true,
+      value(this: HTMLElement): void { captured.add(this) },
+    },
+    hasPointerCapture: {
+      configurable: true,
+      value(this: HTMLElement): boolean { return captured.has(this) },
+    },
+    releasePointerCapture: {
+      configurable: true,
+      value(this: HTMLElement): void { captured.delete(this) },
+    },
+  })
+  return () => {
+    for (const name of names) {
+      const descriptor = previous[name]
+      if (descriptor === undefined) delete (prototype as unknown as Record<string, unknown>)[name]
+      else Object.defineProperty(prototype, name, descriptor)
+    }
+  }
+}
+
+afterEach(() => {
+  document.documentElement.style.removeProperty('--dsh-sidebar-width')
+  document.documentElement.style.removeProperty('--dsh-sidebar-height')
+  document.body.removeAttribute('data-dsh-sidebar-dragging')
+  document.body.innerHTML = ''
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+})
+
+describe('Sidebar layout geometry lifecycle', () => {
+  it('keeps both layout variables present across live size updates and removes them on unmount', () => {
+    const mounted = mountSidebar()
+    const htmlStyle = document.documentElement.style
+    const removeProperty = vi.spyOn(htmlStyle, 'removeProperty')
+    let unmounted = false
+    try {
+      act(() => {
+        mounted.store.reduce(state => setBottomHeight(
+          toggleBottomPanel(setWidth(state, 480)),
+          260,
+        ))
+      })
+
+      expect(htmlStyle.getPropertyValue('--dsh-sidebar-width')).toBe('480px')
+      expect(htmlStyle.getPropertyValue('--dsh-sidebar-height')).toBe('260px')
+      expect(removeProperty.mock.calls.filter(([name]) =>
+        name === '--dsh-sidebar-width' || name === '--dsh-sidebar-height',
+      )).toEqual([])
+
+      removeProperty.mockClear()
+      mounted.unmount()
+      unmounted = true
+      expect(htmlStyle.getPropertyValue('--dsh-sidebar-width')).toBe('')
+      expect(htmlStyle.getPropertyValue('--dsh-sidebar-height')).toBe('')
+      expect(removeProperty.mock.calls.map(([name]) => name).filter(name =>
+        name === '--dsh-sidebar-width' || name === '--dsh-sidebar-height',
+      )).toEqual([
+        '--dsh-sidebar-width',
+        '--dsh-sidebar-height',
+      ])
+    } finally {
+      if (!unmounted) mounted.unmount()
+    }
+  })
+
+  it('writes pointerup geometry before removing the drag marker', () => {
+    const restorePointerCapture = installPointerCapture()
+    const mounted = mountSidebar()
+    const htmlStyle = document.documentElement.style
+    const panelHost = mounted.container.querySelector<HTMLElement>('[data-dsh-panel-host]')!
+    const panel = panelHost.children[1] as HTMLElement
+    const widthHandle = panel.firstElementChild as HTMLElement
+    const startWidth = mounted.store.getSnapshot().state!.width
+    const finalWidth = startWidth + 80
+    const events: string[] = []
+    const originalSetProperty = htmlStyle.setProperty.bind(htmlStyle)
+    const originalRemoveAttribute = document.body.removeAttribute.bind(document.body)
+    vi.spyOn(htmlStyle, 'setProperty').mockImplementation((name, value, priority) => {
+      if (name === '--dsh-sidebar-width' || name === '--dsh-sidebar-height') {
+        events.push(`${name}:${value ?? ''}`)
+      }
+      originalSetProperty(name, value, priority)
+    })
+    vi.spyOn(document.body, 'removeAttribute').mockImplementation((name) => {
+      if (name === 'data-dsh-sidebar-dragging') events.push('drag-marker-removed')
+      originalRemoveAttribute(name)
+    })
+
+    try {
+      act(() => {
+        widthHandle.dispatchEvent(new MouseEvent('pointerdown', {
+          bubbles: true,
+          clientX: 700,
+        }))
+      })
+      expect(document.body.hasAttribute('data-dsh-sidebar-dragging')).toBe(true)
+
+      events.length = 0
+      act(() => {
+        widthHandle.dispatchEvent(new MouseEvent('pointerup', {
+          bubbles: true,
+          clientX: 620,
+        }))
+      })
+
+      const finalWidthWrite = events.indexOf(`--dsh-sidebar-width:${finalWidth}px`)
+      const finalHeightWrite = events.indexOf('--dsh-sidebar-height:0px')
+      const markerRemoval = events.indexOf('drag-marker-removed')
+      expect(finalWidthWrite).toBeGreaterThanOrEqual(0)
+      expect(finalHeightWrite).toBeGreaterThanOrEqual(0)
+      expect(markerRemoval).toBeGreaterThanOrEqual(0)
+      expect(finalWidthWrite).toBeLessThan(markerRemoval)
+      expect(finalHeightWrite).toBeLessThan(markerRemoval)
+      expect(htmlStyle.getPropertyValue('--dsh-sidebar-width')).toBe(`${finalWidth}px`)
+      expect(mounted.store.getSnapshot().state!.width).toBe(finalWidth)
+      expect(document.body.hasAttribute('data-dsh-sidebar-dragging')).toBe(false)
+    } finally {
+      mounted.unmount()
+      restorePointerCapture()
+    }
+  })
+})

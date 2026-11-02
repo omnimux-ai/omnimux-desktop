@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Better Sidebar compiled-bundle harness</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --dsw-alias-bg-layer-1: #14151a;
+        --dsw-alias-bg-layer-2: #1a1c23;
+        --dsw-alias-bg-layer-3: #20232b;
+        --dsw-alias-border-l1: #2a2e38;
+        --dsw-alias-border-l2: #343946;
+        --dsw-alias-border-l4: #667085;
+        --dsw-alias-label-primary: #f3f4f6;
+        --dsw-alias-label-secondary: #c4c8d1;
+        --dsw-alias-label-tertiary: #8d94a3;
+        --dsw-alias-label-dimmed: #626979;
+        --dsw-alias-button-primary-fill: #6d7cff;
+        --dsw-alias-button-primary-hover: #7d8aff;
+        --dsw-alias-interactive-bg-hover: #292d37;
+        --dsw-alias-interactive-bg-hover-accent: #6875e8;
+        --dsw-alias-interactive-bg-active: #30364a;
+        --dsw-alias-state-error-primary: #ff8686;
+        --ds-transition-duration-slow: 180ms;
+        --ds-ease-in-out: ease-in-out;
+      }
+      * { box-sizing: border-box; }
+      html, body { min-width: 920px; min-height: 680px; margin: 0; background: #0f1014; color: #eef0f5; font: 14px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; }
+      body { overflow: hidden; }
+      #harness-panel { position: fixed; inset: 16px auto auto 16px; z-index: 100; width: 390px; padding: 16px; border: 1px solid #343946; border-radius: 14px; background: rgba(25, 27, 34, .96); box-shadow: 0 18px 60px #0008; }
+      #harness-panel h1 { margin: 0 0 6px; font-size: 16px; }
+      #harness-panel p { margin: 0 0 12px; color: #aab0bd; }
+      #harness-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+      #harness-actions button { border: 1px solid #485066; border-radius: 8px; padding: 7px 11px; background: #292e3a; color: #f4f5f7; cursor: pointer; }
+      #harness-actions button:hover { background: #353b49; }
+      #harness-result { display: grid; grid-template-columns: max-content 1fr; gap: 5px 10px; margin: 0; }
+      #harness-result dt { color: #8d94a3; }
+      #harness-result dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+      #harness-result .pass { color: #75df9a; }
+      #harness-result .fail { color: #ff8686; }
+      #root { height: 100vh; margin-right: var(--dsh-sidebar-width, 0px); margin-bottom: var(--dsh-sidebar-height, 0px); transition: margin 180ms ease-in-out; }
+      #app-frame { display: grid; grid-template-columns: 220px minmax(0, 1fr) 260px; height: 100%; }
+      #app-sidebar, #details { border-right: 1px solid #252832; background: #121319; }
+      #details { border-right: 0; border-left: 1px solid #252832; }
+      #conversation-column { min-width: 0; padding: 86px 36px 36px; background: radial-gradient(circle at 50% 5%, #202433 0, #111218 54%); }
+      [data-slot="conversation"] { max-width: 760px; margin: 0 auto; color: #9fa6b4; }
+      [data-slot="conversation"]::before { content: "Dummy conversation shell — no model, account, profile, or live session"; display: block; padding: 24px; border: 1px dashed #343946; border-radius: 14px; }
+    </style>
+  </head>
+  <body>
+    <aside id="harness-panel">
+      <h1>Compiled bundle geometry probe</h1>
+      <p>Loads the exact <code>lib/client.js</code> through its module-loader registration and calls its exported <code>apply(ctx)</code>.</p>
+      <div id="harness-actions">
+        <button id="run-probe" type="button">Run probe</button>
+        <button id="dispose-plugin" type="button">Dispose plugin</button>
+        <button id="remount-plugin" type="button">Remount</button>
+      </div>
+      <dl id="harness-result"><dt>Status</dt><dd id="probe-status">booting…</dd></dl>
+    </aside>
+    <div id="root">
+      <div id="app-frame">
+        <aside id="app-sidebar"></aside>
+        <main id="conversation-column"><div data-slot="conversation"></div></main>
+        <aside id="details"></aside>
+      </div>
+    </div>
+    <script type="module" src="/harness.js"></script>
+  </body>
+</html>
