@@ -44,6 +44,11 @@ jobs:
         run: node scripts/verify-version.mjs
       - name: Install dependencies
         run: corepack yarn install --immutable
+
+        # The AA vendor snapshot must match the latest upstream main commit, so the
+        # runner refreshes it in place instead of failing the build.
+      - name: Refresh Agents Anywhere vendor
+        run: corepack yarn aa:prepare-release
       # Next resolves its product plugins as ordinary npm dependencies, so there is no
       # preset tree to stage. `stage:preset` belongs to the old shell and reads a plugin
       # lifecycle registry Next never produces.
@@ -114,6 +119,11 @@ jobs:
         run: node scripts/verify-version.mjs
       - name: Install dependencies
         run: corepack yarn install --immutable
+
+        # The AA vendor snapshot must match the latest upstream main commit, so the
+        # runner refreshes it in place instead of failing the build.
+      - name: Refresh Agents Anywhere vendor
+        run: corepack yarn aa:prepare-release
       - name: Import Developer ID certificate
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -179,6 +189,11 @@ jobs:
         run: node scripts/verify-version.mjs
       - name: Install dependencies
         run: corepack yarn install --immutable
+
+        # The AA vendor snapshot must match the latest upstream main commit, so the
+        # runner refreshes it in place instead of failing the build.
+      - name: Refresh Agents Anywhere vendor
+        run: corepack yarn aa:prepare-release
       # Same as the macOS job: Next has no preset tree to stage.
       - name: Build Windows installer (website unsigned)
         run: corepack yarn workspace dsh-desktop-next dist:win
@@ -220,6 +235,11 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: corepack yarn install --immutable
+
+        # The AA vendor snapshot must match the latest upstream main commit, so the
+        # runner refreshes it in place instead of failing the build.
+      - name: Refresh Agents Anywhere vendor
+        run: corepack yarn aa:prepare-release
       - name: Download build artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
         with:
