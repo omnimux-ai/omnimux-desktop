@@ -1,0 +1,54 @@
+- id: ui-sidebar-browser
+  # Desktop capability does not depend on the user's Profile name. The later
+  # user patch can still disable the Browser explicitly.
+  disabled: false
+- insert:
+    - id: desktop-next-capabilities
+      name: dsh-desktop-next
+    - id: computer-use
+      name: '@deepseek-ai/dsh-computer-use'
+    - id: computer-use-cua-driver-native
+      name: '@deepseek-ai/dsh-experimental-computer-use-cua-driver-native'
+      disabled: true
+# Upstream mounts its Desktop product analytics for every Profile named
+# `desktop` and reports to DeepSeek's collector by default. DSH Desktop does
+# not take part in that collection. Its exporter also requires the upstream
+# Electron shell's DSH_CLIENT_VERSION, which Next never provides.
+- id: desktop-product-telemetry
+  disabled: true
+- id: product-analytics
+  disabled: true
+# The omnimux hub serves HMR over its own WebSocket and refuses to mount while the
+# official EventSource row is present. omnimux's own bundle patch says the same, but
+# bundle patches apply in list order and `@deepseek-ai/dsh-web-app` inserts this row
+# after omnimux, so that declaration lands before the row exists. Disabling it here —
+# in the last patch applied — is what actually takes effect.
+- id: client-hmr
+  name: '@deepseek-ai/dsh-client-hmr'
+  disabled: true
+# ── Features this release line does not ship ────────────────────────────────
+#
+# Each row below is paired with an entry in `runtime-file-policy.ts`'s unused
+# feature table, which keeps the package out of the payload. Both halves are
+# required: disabling only the row leaves ~450 MB of native runtime in the
+# installer, and excluding only the package makes the Host fail to resolve a
+# bundle the profile still lists. `tests/payload-exclusions.spec.ts` pins the pair.
+#
+# Office preview pulls `libreoffice-kit` (305 MB across both CPUs).
+- id: office-to-pdf
+  name: '@deepseek-ai/dsh-office-to-pdf'
+  disabled: true
+- id: skill-office
+  name: '@deepseek-ai/dsh-skill-office'
+  disabled: true
+# Voice input pulls `sherpa-onnx` (69 MB). Disabling the bundle keeps both of its
+# inner rows from mounting, so the individual rows are not named here.
+- id: voice-input
+  name: '@deepseek-ai/dsh-experimental-voice-input-bundle'
+  disabled: true
+# The Agents Anywhere bridge is the only consumer of `@dataiku/uv` (83 MB of
+# Python runtime). This line does not enable remote control, so the bridge and
+# its Python payload stay out.
+- id: agents-anywhere-bridge
+  name: '@agents-anywhere/dsh-bridge-next'
+  disabled: true
