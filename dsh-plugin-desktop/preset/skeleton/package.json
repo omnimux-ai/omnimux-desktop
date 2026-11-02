@@ -1,0 +1,21 @@
+{
+  "name": "dsh-profile-omnimux",
+  "private": true,
+  "dependencies": {},
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-better-sidebar",
+        "omnimux",
+        "omnimux-assets",
+        "omnimux-workflow",
+        "omnimux-accounts",
+        "omnimux-publish",
+        "omnimux-analytics",
+        "omnimux-forms"
+      ]
+    }
+  }
+}

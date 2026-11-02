@@ -1,0 +1,6 @@
+# Product defaults for the OmniMux desktop profile. Edit freely.
+# Applied after every bundle layer. Do not put API keys here.
+- id: agent-default-model
+  config:
+    provider: omnimux
+    model: deepseek-v4-flash

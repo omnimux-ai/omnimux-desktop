@@ -1,0 +1,9 @@
+packages:
+  - .
+
+nodeLinker: hoisted
+autoInstallPeers: false
+minimumReleaseAge: 0
+allowBuilds:
+  node-pty@1.1.0: true
+  node-pty@file:.materialize-snapshots/plugins/node-pty: true

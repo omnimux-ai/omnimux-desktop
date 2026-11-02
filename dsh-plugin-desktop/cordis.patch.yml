@@ -1,0 +1,45 @@
+# Desktop Host operations compose around the existing Web bundle. Compatibility
+# mode keeps upstream ownership of the browser carrier and rendered UI.
+- id: ui-sidebar-browser
+  # Desktop capability does not depend on the user's Profile name. The later
+  # user patch can still disable the Browser explicitly.
+  disabled: false
+
+- insert:
+    - id: desktop-shell
+      name: dsh-plugin-desktop
+      config:
+        mode: compatibility
+    - id: desktop-terminal
+      name: dsh-plugin-desktop/terminal
+      disabled: !!js process.platform === 'linux'
+    - id: desktop-diagnostics
+      name: dsh-plugin-desktop/diagnostics
+    - id: desktop-notifications
+      name: dsh-plugin-desktop/notifications
+    - id: desktop-pnpm
+      name: dsh-plugin-desktop/pnpm
+    - id: desktop-profiles
+      name: dsh-plugin-desktop/profiles
+    - id: desktop-updates
+      name: dsh-plugin-desktop/updates
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+
+# A desktop launch has no terminal operator waiting for the Web readiness line.
+- id: web-runtime
+  config:
+    openBrowser: false
+    printUrl: false
+    surfaceContext: true
+    trustedHosts: []
+
+# Hide two official native surface elements unused in the OmniMux social-media
+# workflow: the Trajectory conversation view tab and the Session-log download
+# button. These rows are defined by the dsh-web-app bundle patch; this overlay
+# lands after it (src/profile.ts compose order), so the dsh-client-modules
+# browser scan skips the disabled entries.
+- id: ui-trajectory
+  disabled: true
+- id: session-log-download
+  disabled: true
