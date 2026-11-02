@@ -1,0 +1,72 @@
+diff --git a/package.json b/package.json
+index 4d9de77..6e7e4fa 100644
+--- a/package.json
++++ b/package.json
+@@ -62,11 +62,13 @@
+     "lib/client-terminal.js",
+     "lib/client-editor.js",
+     "lib/client-mermaid.js",
++    "lib/client-locale.js",
+     "lib/types/**/*.d.ts",
+     "src",
+     "scripts/install.sh",
+     "scripts/install.ps1",
+     "cordis.patch.yml",
++    "omnimux-build.json",
+     "README.md",
+     "README_EN.md",
+     "LICENSE"
+diff --git a/tsdown.config.ts b/tsdown.config.ts
+index 881a45d..47bc3fe 100644
+--- a/tsdown.config.ts
++++ b/tsdown.config.ts
+@@ -91,6 +91,18 @@ const CSS_VIRTUAL_PREFIX = '\0dsh-css:'
+ const CSS_VIRTUAL_SUFFIX = '.mjs'
+ 
+ const REPOSITORY_ROOT = fileURLToPath(new URL('.', import.meta.url))
++const cssFiles = new Map<string, string>()
++
++/** Stable build identity for CSS while retaining the absolute disk path separately. */
++function stableCssId(absolutePath: string): string {
++  const repositoryPath = relative(REPOSITORY_ROOT, absolutePath).split(sep).join('/')
++  if (!repositoryPath.startsWith('../')) return repositoryPath
++  const normalized = absolutePath.split(sep).join('/')
++  const nodeModules = normalized.lastIndexOf('/node_modules/')
++  if (nodeModules < 0) throw new Error(`CSS path is outside the repository and dependency tree: ${absolutePath}`)
++  const dependencyPath = normalized.slice(nodeModules + '/node_modules/'.length)
++  return `node_modules/${dependencyPath}`
++}
+ 
+ /** The style-injection prologue shared by module css and plain css loads. */
+ function injectTag(pluginId: string, fileId: string, cssText: string): string {
+@@ -292,13 +304,17 @@ function makeCssPlugin(pluginId: string): BuildPlugin {
+       } else {
+         abs = require.resolve(source)
+       }
+-      return CSS_VIRTUAL_PREFIX + abs + CSS_VIRTUAL_SUFFIX
++      const stableId = stableCssId(abs)
++      cssFiles.set(stableId, abs)
++      return CSS_VIRTUAL_PREFIX + stableId + CSS_VIRTUAL_SUFFIX
+     },
+     async load(virtualId: string) {
+       if (!virtualId.startsWith(CSS_VIRTUAL_PREFIX)) return null
+       const fileId = virtualId.slice(CSS_VIRTUAL_PREFIX.length, -CSS_VIRTUAL_SUFFIX.length)
+-      this.addWatchFile(fileId)
+-      const source = await readFile(fileId)
++      const diskPath = cssFiles.get(fileId)
++      if (diskPath === undefined) throw new Error(`missing CSS disk path for ${fileId}`)
++      this.addWatchFile(diskPath)
++      const source = await readFile(diskPath)
+       // CSS Modules (x.module.css) become hashed class maps; plain css
+       // (xterm's stylesheet) is inlined verbatim.
+       if (fileId.endsWith('.module.css')) {
+@@ -309,7 +325,8 @@ function makeCssPlugin(pluginId: string): BuildPlugin {
+           minify: true,
+         })
+         const classMap: Record<string, string> = {}
+-        for (const [local, exp] of Object.entries(cssExports ?? {})) classMap[local] = exp.name
++        const sortedExports = cssExports ?? {}
++        for (const local of Object.keys(sortedExports).sort()) classMap[local] = sortedExports[local]!.name
+         return [
+           injectTag(pluginId, fileId, code.toString()),
+           `export default ${JSON.stringify(classMap)};`,

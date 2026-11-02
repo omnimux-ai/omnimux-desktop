@@ -1,0 +1,2090 @@
+diff --git a/package.json b/package.json
+index 4f1739a..b625666 100644
+--- a/package.json
++++ b/package.json
+@@ -71,7 +71,8 @@
+     "README_ZH.md",
+     "LICENSE",
+     "icon.svg",
+-    "locale/*.json"
++    "locale/*.json",
++    "omnimux-build.json"
+   ],
+   "scripts": {
+     "build": "node -e \"require('node:fs').rmSync('lib',{recursive:true,force:true})\" && tsc -p tsconfig.build.json && tsdown",
+@@ -150,7 +151,12 @@
+     "react-icons": "5.7.0",
+     "rxjs": "^7.8.2",
+     "ws": "^8.18.0",
+-    "yaml": "^2.9.1"
++    "yaml": "^2.9.1",
++    "acorn": "8.18.0",
++    "css-tree": "3.2.1",
++    "es-module-lexer": "2.3.2",
++    "parse5": "8.0.1",
++    "saxes": "6.0.0"
+   },
+   "devDependencies": {
+     "@cordisjs/plugin-loader": "^1.0.0-rc.5",
+@@ -225,7 +231,8 @@
+     "typescript-eslint": "^8.69.0",
+     "unrun": "^0.2.39",
+     "vitest": "^4.1.8",
+-    "zustand": "~4.4.7"
++    "zustand": "~4.4.7",
++    "@types/css-tree": "2.3.11"
+   },
+   "icon": "./icon.svg"
+ }
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 472caa5..1b7fc33 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -86,21 +86,36 @@ importers:
+       '@xterm/xterm':
+         specifier: ^6.0.0
+         version: 6.0.0
++      acorn:
++        specifier: 8.18.0
++        version: 8.18.0
+       clsx:
+         specifier: ^2.1.1
+         version: 2.1.1
++      css-tree:
++        specifier: 3.2.1
++        version: 3.2.1
+       dompurify:
+         specifier: ^3.4.14
+         version: 3.4.14
++      es-module-lexer:
++        specifier: 2.3.2
++        version: 2.3.2
+       mermaid:
+         specifier: ^11.16.1
+         version: 11.17.0
++      parse5:
++        specifier: 8.0.1
++        version: 8.0.1
+       react-icons:
+         specifier: 5.7.0
+         version: 5.7.0(react@18.2.0)
+       rxjs:
+         specifier: ^7.8.2
+         version: 7.8.2
++      saxes:
++        specifier: 6.0.0
++        version: 6.0.0
+       ws:
+         specifier: ^8.18.0
+         version: 8.21.3
+@@ -216,6 +231,9 @@ importers:
+       '@shikijs/langs':
+         specifier: ^4.3.1
+         version: 4.4.3
++      '@types/css-tree':
++        specifier: 2.3.11
++        version: 2.3.11
+       '@types/mdast':
+         specifier: ^4.0.4
+         version: 4.0.4
+@@ -1360,6 +1378,9 @@ packages:
+   '@types/chai@5.2.3':
+     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
++  '@types/css-tree@2.3.11':
++    resolution: {integrity: sha512-aEokibJOI77uIlqoBOkVbaQGC9zII0A+JH1kcTNKW2CwyYWD8KM6qdo+4c77wD3wZOQfJuNWAr9M4hdk+YhDIg==}
++
+   '@types/d3-array@3.2.2':
+     resolution: {integrity: sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==}
+
+@@ -1608,133 +1629,157 @@ packages:
+     resolution: {integrity: sha512-C/0zV5IhgVdYhGJTwrY0v8dknxlhiKwtVJkMUaexu9/QvRmzlV4vfU3hZlUSgqc2BxQHntL1mCVbDq8j0FRFDw==}
+     cpu: [arm64]
+     os: [android]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-darwin-arm64@0.8.7':
+     resolution: {integrity: sha512-/u+REDMI4a0/lsJXTM4c53/w31OGZLOReZIyg62uhgLs0kc8NHsj/nOcxTdlQjq5gi0zhdkccD9LaLTXcdzPvw==}
+     cpu: [arm64]
+     os: [darwin]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-darwin-x64@0.8.7':
+     resolution: {integrity: sha512-sMMzFOwCo4WXR+/6zIBThOocSC50iIIZZdfiIDbaLvj0Ax/rWt/iavyfEAqajyvzydLyCqR/ZItdLWSRlu1umw==}
+     cpu: [x64]
+     os: [darwin]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-freebsd-x64@0.8.7':
+     resolution: {integrity: sha512-MpdpKXix9P+Y1rKgjvcNeNtGjXeL1CmttNhYINrWls8kRpm4xM/oBGTmn6w7to8lAlwj5jm8q03dQPl5mRv4Qw==}
+     cpu: [x64]
+     os: [freebsd]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-arm-gnu@0.8.7':
+     resolution: {integrity: sha512-rr1srFLlPAmC1vtxfc9C1YLDe3iH09YjfSeeIidBqKhzx1MATjOAq4mjlRUOnhr/L27MotWIYOFKwVsd5JZFOg==}
+     cpu: [arm]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-arm-musl@0.8.7':
+     resolution: {integrity: sha512-eAufXh8qBRpiSO6ueaMDL+yyoXIGLhpUce72YbcACtZU2qhExwBIJyEtQf5kH2Ki0X2aqkSjSfog4OPtKXan3Q==}
+     cpu: [arm]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-arm64-gnu@0.8.7':
+     resolution: {integrity: sha512-gw4w6wPoHObBrdIC4duVWLmJOvpdE25j5D7yrM5mACNlK4klRz/lv8hK+ssQk9EJHBgZjSaqZIJVFgqNYbfv7A==}
+     cpu: [arm64]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-arm64-musl@0.8.7':
+     resolution: {integrity: sha512-L68N6Y4XkqcIaKo3Ra88JEvBEH4AHff44A4INcrxeVWZ8CZtu2tCpfVxe3hR8qQQMcvBSQlDn24KpkCKEhVvfA==}
+     cpu: [arm64]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-x64-gnu@0.8.7':
+     resolution: {integrity: sha512-dzyAbltJmf3Cqlb8HcFuYIf5Yn0fl1vTr3XJ9HiVNNvOlhqPSArOqtw9vI1p6/VTXTjrMLXlU+s+/kNHiIy/Cw==}
+     cpu: [x64]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-linux-x64-musl@0.8.7':
+     resolution: {integrity: sha512-Otw4MH3404q0Bbvl+YTdW9aoUV5vXmUw8260bWvt1XlaoIX/ceSgI4ygheRDMfBPoHt6FDayQaO9OLVUZAgkFA==}
+     cpu: [x64]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-win32-arm64@0.8.7':
+     resolution: {integrity: sha512-qo/jyrzryiBuKEsFiuWaBCBe3tRMynQ0qFWFgOEjcCMQeZfBm+wKiVEUEFXXLc7bh8YezguAWp0Mtnhq4ARNyA==}
+     cpu: [arm64]
+     os: [win32]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-codegen/binding-win32-x64@0.8.7':
+     resolution: {integrity: sha512-D5lDsVDx6m00E6bWySlWdH72Ca4TPSaphDqB6QjU6MpuNLIJqoGoatYyq2rOmBE8Zv/kunot/o58KGL03P3eiA==}
+     cpu: [x64]
+     os: [win32]
++    deprecated: yuku-codegen is pure JavaScript since 0.14
+
+   '@yuku-parser/binding-android-arm64@0.8.7':
+     resolution: {integrity: sha512-eGKYiUDX7Y0V7tDTmg+JTVnXnjMqfXXsorZ+EDf5kxwchQ3Or1HS14MzI2fw+jFhHR85fCWt+mtX33Yao73hIQ==}
+     cpu: [arm64]
+     os: [android]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-darwin-arm64@0.8.7':
+     resolution: {integrity: sha512-Re0RHelKLnjEURulY2/KxW+Ngb8zuNA4BRZuMwgGQNzVumT6u4U2N2hc01oeYVNVof0i7GrXE4UCNBgbpRRnjQ==}
+     cpu: [arm64]
+     os: [darwin]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-darwin-x64@0.8.7':
+     resolution: {integrity: sha512-Hn8DROtQkjlA1ACbPgj4a7eP9IuVOI504oiTwpkWPbpaDWD9KdmnVYCqW+1LfenNK/g7O9NhWGpXEdaCNX7lIA==}
+     cpu: [x64]
+     os: [darwin]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-freebsd-x64@0.8.7':
+     resolution: {integrity: sha512-bAP2OV8wRuzplX/jYxv9+vvqQT8JxyNphI8fLfXGL054Xs+4/J5u33cIm3y4rxY8rdoLmmdiJs2Tq7r7lrDRfA==}
+     cpu: [x64]
+     os: [freebsd]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-arm-gnu@0.8.7':
+     resolution: {integrity: sha512-kTYwJQQgmZeAWdDIWabiReIZMpmfLueIj1tCmjStUtFGhR1Z0qwxonKVfUC4N7h/VhGGzLZ//7O1kgt1QKqgCg==}
+     cpu: [arm]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-arm-musl@0.8.7':
+     resolution: {integrity: sha512-uL4jE8HPT2BLlxAXyD10LqgPuXa9eDa0BKpCdSANmzIJghq/2eZo3/gQNtaxPZMupWoxjYzSad9IXrwu7aYPXQ==}
+     cpu: [arm]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-arm64-gnu@0.8.7':
+     resolution: {integrity: sha512-3gVN4pWSKZmXiNX7cU164dR9MPvesCHnlH6nPfpK+yQsCuYphjKKplcb4SnZBrhiqmXbgb2HR0c2TS0IZUPhgA==}
+     cpu: [arm64]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-arm64-musl@0.8.7':
+     resolution: {integrity: sha512-S0mwfEjoLpxzXeZw802Wa4RaELsQiPtWqG6INcy8j4GtvNFtl4LCX3eGO1XLn9pyLAISLzTRyU3zUCBUPin8lg==}
+     cpu: [arm64]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-x64-gnu@0.8.7':
+     resolution: {integrity: sha512-lnbWdPmerE5D1uH1G4IEZKnPzCrWCStRGrtgpSIe1RibAo5bZIjDbbbPYXmMHCEh4F+x/JaJpElh26a3r+BPbg==}
+     cpu: [x64]
+     os: [linux]
+     libc: [glibc]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-linux-x64-musl@0.8.7':
+     resolution: {integrity: sha512-769uwndMvMzUvATWbAcEvyLHKA+DzhHSCl/obBUrRdYfRo26yxui6S8y3z7uJ+Naup7UKrDxrpK7OnQkxkl9KQ==}
+     cpu: [x64]
+     os: [linux]
+     libc: [musl]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-win32-arm64@0.8.7':
+     resolution: {integrity: sha512-mEB/9PlaAkisJ6KWGz0zvywXoU6+80dTlR2LwS7s/jcXXoU6fm2+sitBZXtqu3+Q4DcDgPxM45uWMCzPs0TSRw==}
+     cpu: [arm64]
+     os: [win32]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-parser/binding-win32-x64@0.8.7':
+     resolution: {integrity: sha512-8vNB2DP0ou61nGb8tc/qfi41gfyDXz1MHr2zqL3nR+cJ6CEbiuWV/l/a/vv151gCgiZLLAyGkQGENpozdg716w==}
+     cpu: [x64]
+     os: [win32]
++    deprecated: yuku-parser runs on yuku-core since 0.14
+
+   '@yuku-toolchain/types@0.8.7':
+     resolution: {integrity: sha512-2Z53dNxAJL6UvFoIrDZvYf3zlO8s4VJK4O2hhaB4mXVwwpX/7ajtss3cmfqKvamlNLWyt9FSWs4eoYdlbxpnHA==}
+@@ -3025,10 +3070,6 @@ packages:
+     resolution: {integrity: sha512-BwqATHxAulx7X6kNdTkecy7PBjLkgtAHcgrwYLd9iA+cD2At9DzhJwdwaSELk2+aZe01IfiM/Wxtyp68Dvup2A==}
+     engines: {node: '>=0.12.18'}
+
+-  source-map-js@1.2.1:
+-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
+-    engines: {node: '>=0.10.0'}
+-
+   source-map-js@1.2.2:
+     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
+     engines: {node: '>=0.10.0'}
+@@ -4506,6 +4547,8 @@ snapshots:
+       '@types/deep-eql': 4.0.2
+       assertion-error: 2.0.1
+
++  '@types/css-tree@2.3.11': {}
++
+   '@types/d3-array@3.2.2': {}
+
+   '@types/d3-axis@3.0.6':
+@@ -5033,7 +5076,7 @@ snapshots:
+   css-tree@3.2.1:
+     dependencies:
+       mdn-data: 2.27.1
+-      source-map-js: 1.2.1
++      source-map-js: 1.2.2
+
+   csstype@3.2.3: {}
+
+@@ -6333,8 +6376,6 @@ snapshots:
+
+   simple-icons@16.32.0: {}
+
+-  source-map-js@1.2.1: {}
+-
+   source-map-js@1.2.2: {}
+
+   space-separated-tokens@2.0.2: {}
+diff --git a/src/client/HtmlPreview.tsx b/src/client/HtmlPreview.tsx
+new file mode 100644
+index 0000000..1080797
+--- /dev/null
++++ b/src/client/HtmlPreview.tsx
+@@ -0,0 +1,28 @@
++/** The GUI reads saved snapshots; untrusted frames receive only serialized HTML. */
++import { useEffect, useState } from 'react'
++import { api, type SessionScope } from './api.ts'
++import { HTML_IFRAME_SANDBOX } from './html-preview.ts'
++import { t } from './locales.ts'
++import type { PreviewSnapshot } from '../html-preview-types.ts'
++
++export function HtmlPreview(props: { scope: SessionScope; path: string; generation?: number; className?: string }) {
++  const { sessionId, cwd } = props.scope
++  const identity = JSON.stringify([sessionId, cwd, props.path, props.generation ?? 0])
++  const [result, setResult] = useState<{ identity: string; snapshot?: PreviewSnapshot; error?: string } | null>(null)
++  useEffect(() => {
++    const abort = new AbortController()
++    let current = true
++    api.htmlPreview({ sessionId, cwd }, props.path, abort.signal).then(snapshot => {
++      if (current) setResult({ identity, snapshot })
++    }).catch((error: unknown) => {
++      if (current) setResult({ identity, error: error instanceof Error ? error.message : String(error) })
++    })
++    return () => { current = false; abort.abort() }
++  }, [sessionId, cwd, props.path, identity])
++  if (result?.identity !== identity) return <div role="status">{t('loading')}</div>
++  if (result.error !== undefined) return <div role="alert">{result.error}</div>
++  if (!result.snapshot) return null
++  return <iframe key={identity} className={props.className} title={props.path}
++    sandbox={HTML_IFRAME_SANDBOX} referrerPolicy="no-referrer" allow=""
++    srcDoc={result.snapshot.html} />
++}
+diff --git a/src/client/TextEditor.tsx b/src/client/TextEditor.tsx
+index d398bf9..e6da6f4 100644
+--- a/src/client/TextEditor.tsx
++++ b/src/client/TextEditor.tsx
+@@ -28,7 +28,7 @@ import {
+   useEditorGitGutter,
+   type GitGutterHost,
+ } from './editor-git-gutter.ts'
+-import { api, htmlUrl, SidebarApiError } from './api.ts'
++import { api, SidebarApiError } from './api.ts'
+ import { hostTransportBase } from './desktop-env.ts'
+ import { markdownPreviewSource } from './markdown-frontmatter.ts'
+ import { rewriteLocalImageUrls } from './markdown-images.ts'
+@@ -37,7 +37,7 @@ import { languageForPath } from './lang.ts'
+ import { cmSurfaceTheme, CmThemeCompartment } from './cm-themes.ts'
+ import { cmSearchExtensions, CmSearchPhrases } from './cm-search.ts'
+ import { isDarkScheme, subscribeColorScheme } from './theme.ts'
+-import { SandboxStatusBar } from './SandboxStatusBar.tsx'
++import { HtmlPreview } from './HtmlPreview.tsx'
+ import { insertReferenceOrText, type PendingReference } from './conversation-draft.ts'
+ import { useSelectionPopup } from './selection-popup.ts'
+ import { buildSelectionInsert, linesOfSelection } from './selection-payload.ts'
+@@ -48,7 +48,6 @@ import { useMarkdownSurface } from './use-markdown-surface.ts'
+ import { MdToc } from './md-toc.tsx'
+ import { splitMermaidBlocks } from './mermaid-blocks.ts'
+ import { localeSignature, t } from './locales.ts'
+-import { HTML_IFRAME_SANDBOX } from './html-preview.ts'
+ import type { EditorToolbarState, FileViewerProps } from './service.ts'
+ import css from './sidebar.module.css'
+
+@@ -735,6 +734,9 @@ export function TextEditor(props: FileViewerProps) {
+       setDirty(false)
+       setConflict(false)
+       setSaveState('saved')
++      // The preview shows the SAVED file, so a successful save is exactly the
++      // moment its snapshot is stale.
++      setPreviewGeneration(value => value + 1)
+       // The saved bytes are a new revision of the uncommitted diff: re-read
+       // the change set (the file's XY status code usually stays the same, so
+       // the status store alone would never wake the gutter up again).
+@@ -898,15 +900,10 @@ export function TextEditor(props: FileViewerProps) {
+    *  unsaved edits survive the round trip. */
+   const showingPreview = !readOnly && mode === 'preview' && (markdown || html || jsonl)
+   const saveLabel = saveState === 'saving' ? t('loading') : saveState === 'saved' ? t('saved') : saveState === 'failed' ? t('saveFailed') : ''
+-  // Per-feature sandbox escape hatch: the global side card setting (warned)
+-  // plus a per-surface temporary unlock. The unlock state starts at the
+-  // "default unsafe" pref so a preview can open straight into the red
+-  // unsandboxed state (still restorable from the status row). With the
+-  // sandbox OFF the preview iframe drops its sandbox attribute entirely —
+-  // the previewed page then runs on the GUI's own origin with full session
+-  // access.
+-  const [localUnlock, setLocalUnlock] = useState(() => props.store?.getPrefs().htmlViewerDefaultUnsafe === true)
+-  const htmlNoSandbox = props.store?.getPrefs().htmlViewerNoSandbox === true || localUnlock
++  // The sandbox is a hard boundary in this build: no global setting and no
++  // per-surface unlock. A previewed page always runs in an opaque origin, so a
++  // persisted legacy "unsafe" preference cannot widen it.
++  const [previewGeneration, setPreviewGeneration] = useState(0)
+
+   // Host-toolbar mode (the merged editor header renders the controls): skip
+   // the own toolbar row, report the state after every relevant render (the
+@@ -1097,27 +1094,7 @@ export function TextEditor(props: FileViewerProps) {
+         </div>
+       )}
+       {html && mode === 'preview' && (
+-        <>
+-          <SandboxStatusBar
+-            sandboxed={!htmlNoSandbox}
+-            local={localUnlock}
+-            dangerCopy={t('htmlNoSandboxWarning')}
+-            onUnlock={() => { setLocalUnlock(true) }}
+-            onRestore={() => { setLocalUnlock(false) }}
+-          />
+-          {/* Route-src (never srcdoc — a srcdoc frame inherits the parent
+-              origin when unsandboxed; the route URL keeps the frame
+-              cross-origin by construction). The preview shows the SAVED
+-              file; the draft is only visible in edit mode. */}
+-          <iframe
+-            className={css.editorHtml}
+-            src={htmlUrl(scope, path)}
+-            sandbox={htmlNoSandbox ? undefined : HTML_IFRAME_SANDBOX}
+-            referrerPolicy="no-referrer"
+-            allow=""
+-            title={path}
+-          />
+-        </>
++        <HtmlPreview scope={scope} path={path} generation={previewGeneration} className={css.editorHtml} />
+       )}
+       {selectionPopup.popup !== null && createPortal(
+         <button
+diff --git a/src/client/api.ts b/src/client/api.ts
+index ccaaa8c..46f89a0 100644
+--- a/src/client/api.ts
++++ b/src/client/api.ts
+@@ -8,6 +8,7 @@
+  * request). Failures surface as {@link SidebarApiError} with the wire code.
+  */
+ import { encodeHtmlUrl } from '../html-route.ts'
++import type { PreviewSnapshot } from '../html-preview-types.ts'
+ import { hostRouteUrl } from './host-route-url.ts'
+ import { resolveSidebarPath } from './paths.ts'
+ import type {
+@@ -427,6 +428,8 @@ function openExternal(payload: OpenExternalPayload): Promise<OpenExternalResult>
+
+ /** The sidebar API surface (session scope threaded through every call). */
+ export const api = {
++  htmlPreview: (scope: SessionScope, path: string, signal?: AbortSignal) =>
++    call<PreviewSnapshot>('html.preview', { sessionId: scope.sessionId, cwd: scope.cwd, path }, signal),
+   sessionCwd: (scope: SessionScope, signal?: AbortSignal) =>
+     call<{ sessionId: string; cwd: string; root: string; parent: string | null }>('session.cwd', scopePayload(scope, {}), signal),
+   fsTree: (scope: SessionScope, path: string, exclude?: readonly string[], signal?: AbortSignal) =>
+diff --git a/src/client/builtins/viewers.tsx b/src/client/builtins/viewers.tsx
+index 4891a15..b3ce25f 100644
+--- a/src/client/builtins/viewers.tsx
++++ b/src/client/builtins/viewers.tsx
+@@ -38,10 +38,13 @@ import { lazyChunkComponent } from '../lazy-chunk.tsx'
+ import {
+   IconMarkdownOutline16,
+   IconHtmlOutline16,
++  IconVideoOutline16,
++  IconAudioOutline16,
+ } from '../icons.tsx'
+ import type { ComponentType } from 'react'
+ import type { FileViewerDescriptor, FileViewerProps } from '../service.ts'
+ import { t } from '../locales.ts'
++import css from '../sidebar.module.css'
+
+ /**
+  * Lazy wrapper over the chunk-resident viewer component. The `pick`
+@@ -51,9 +54,37 @@ import { t } from '../locales.ts'
+  */
+ const LazyTextEditor = lazyChunkComponent<FileViewerProps>('editor', (mod) => mod.TextEditor as ComponentType<FileViewerProps> | undefined)
+
+-/** The 4 built-in file viewer descriptors. */
++/** The 6 built-in file viewer descriptors. */
+ export function builtinViewers(): readonly FileViewerDescriptor[] {
+   return [
++    {
++      id: 'video',
++      title: () => t('viewerVideo'),
++      icon: (size: number) => <IconVideoOutline16 size={size} />,
++      exts: ['mp4', 'webm', 'mov', 'm4v', 'ogv'],
++      // Same media route as images, stepped up to byte-range streaming: the
++      // player seeks inside a large file instead of waiting for the whole
++      // body, and nothing is buffered on the host (see the range branch in
++      // index.ts's /sidebar/file handler).
++      fetchStrategy: 'mediaUrl',
++      component: ({ mediaUrl: url, title }) => (
++        <div className={css.mediaStage}>
++          <video className={css.mediaVideo} src={url} title={title} controls playsInline />
++        </div>
++      ),
++    },
++    {
++      id: 'audio',
++      title: () => t('viewerAudio'),
++      icon: (size: number) => <IconAudioOutline16 size={size} />,
++      exts: ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'opus', 'aac'],
++      fetchStrategy: 'mediaUrl',
++      component: ({ mediaUrl: url, title }) => (
++        <div className={css.mediaStage}>
++          <audio className={css.mediaAudio} src={url} title={title} controls />
++        </div>
++      ),
++    },
+     {
+       id: 'markdown',
+       title: () => t('viewerMarkdown'),
+@@ -68,20 +99,10 @@ export function builtinViewers(): readonly FileViewerDescriptor[] {
+       icon: (size: number) => <IconHtmlOutline16 size={size} />,
+       exts: ['html', 'htm'],
+       fetchStrategy: 'fsRead',
+-      // Declarative settings: the sandbox escape hatch and the default-unsafe
+-      // start state render under this viewer's row in the Side card settings
+-      // page (both warned on).
+-      settings: {
+-        toggles: [{
+-          key: 'htmlViewerNoSandbox',
+-          title: () => t('settingsHtmlSandboxTitle'),
+-          desc: () => t('settingsHtmlSandboxDesc'),
+-        }, {
+-          key: 'htmlViewerDefaultUnsafe',
+-          title: () => t('settingsHtmlDefaultUnsafeTitle'),
+-          desc: () => t('settingsHtmlDefaultUnsafeDesc'),
+-        }],
+-      },
++      // No settings row: this build has no sandbox escape hatch to configure.
++      // The preview is always an opaque-origin frame, and the legacy
++      // `htmlViewerNoSandbox` / `htmlViewerDefaultUnsafe` keys a profile may
++      // still carry are inert.
+       component: (props) => <LazyTextEditor {...props} />,
+     },
+     {
+diff --git a/src/client/candidate-paths.ts b/src/client/candidate-paths.ts
+new file mode 100644
+index 0000000..eacd8f9
+--- /dev/null
++++ b/src/client/candidate-paths.ts
+@@ -0,0 +1,155 @@
++/**
++ * Pure heuristic recognizer for candidate workspace file paths in prose inline code.
++ *
++ * Used to expand chatFileMentions so that any path-like inline code token
++ * (e.g. `docs/evidence/demo.png`, `package.json`, `./src/client/index.tsx`)
++ * renders as a clickable button that opens the sidebar instead of staying
++ * inert, even when the file was not mutated in the closing turn.
++ *
++ * The host's own mention vocabulary is deliberately narrow: it comes from the
++ * mutation tools' `locations` (ui-deliverables' README: "never from the
++ * closing prose") and matches an exact path or a unique basename. This
++ * recognizer is the widening the host deferred — so it stays a pure predicate
++ * and never opens anything itself.
++ */
++
++const KNOWN_EXACT_FILES = new Set([
++  'makefile',
++  'dockerfile',
++  'license',
++  'agents.md',
++  'claude.md',
++  'gemini.md',
++  'readme.md',
++  '.gitignore',
++  '.editorconfig',
++  '.npmrc',
++  '.prettierrc',
++  '.eslintrc',
++  'pnpm-lock.yaml',
++  'package-lock.json',
++  'yarn.lock',
++  'gemfile',
++  'procfile',
++])
++
++const KNOWN_EXTENSIONS = new Set([
++  // Images
++  'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'ico', 'avif', 'apng',
++  // Video & Audio
++  'mp4', 'webm', 'mov', 'm4v', 'ogv', 'mp3', 'wav', 'flac', 'ogg', 'm4a', 'opus', 'aac',
++  // Documents & Data
++  'md', 'markdown', 'pdf', 'txt', 'csv', 'tsv', 'json', 'jsonc', 'json5',
++  'yaml', 'yml', 'toml', 'xml', 'html', 'htm',
++  // Code & Styles
++  'ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs', 'mts', 'cts',
++  'py', 'sh', 'bash', 'zsh', 'css', 'scss', 'less', 'sql',
++  'go', 'rs', 'java', 'c', 'cpp', 'h', 'hpp', 'vue', 'svelte',
++  // Office
++  'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt',
++])
++
++const INVALID_CHARS_REGEX = /[<>:"|?*`\n\r\t]/
++const CODE_EXPRESSION_REGEX = /(?:=>|==|!=|&&|\|\||;|\{|\}|\(|\))/
++
++/**
++ * Determine whether a string value from an inline-code token looks like a file path.
++ *
++ * Rejects code snippets, operators, URLs, and arbitrary prose while accepting
++ * relative paths, paths with directories, and recognizable filenames.
++ */
++export function isCandidateFilePath(value: string): boolean {
++  if (!value) return false
++  const trimmed = value.trim()
++  const len = trimmed.length
++  if (len < 2 || len > 300) return false
++
++  // Disallow newlines, invalid filesystem characters, or common code statement markers
++  if (INVALID_CHARS_REGEX.test(trimmed)) return false
++  if (CODE_EXPRESSION_REGEX.test(trimmed)) return false
++
++  // Reject web protocols
++  const lower = trimmed.toLowerCase()
++  if (lower.startsWith('http://') || lower.startsWith('https://') || lower.startsWith('data:')) {
++    return false
++  }
++
++  // Reject CLI commands or flag strings like `--flag`, `-v`
++  if (trimmed.startsWith('-')) {
++    return false
++  }
++
++  // Feature 1: Exact known standalone filenames (case-insensitive)
++  const baseName = lower.split(/[\\/]/).pop() ?? ''
++  if (KNOWN_EXACT_FILES.has(baseName)) {
++    return true
++  }
++
++  // Feature 2: Contains path separators (/ or \)
++  const hasSlash = trimmed.includes('/') || trimmed.includes('\\')
++  if (hasSlash) {
++    // Avoid regex or division like `a / b`
++    if (trimmed.includes(' / ') || trimmed.includes(' \\ ')) return false
++    // Reject git diff prefixes alone
++    if (trimmed === 'a/' || trimmed === 'b/') return false
++
++    // Check if it ends with an extension or has valid path segments
++    const dotIndex = trimmed.lastIndexOf('.')
++    if (dotIndex > 0 && dotIndex < trimmed.length - 1) {
++      const ext = trimmed.slice(dotIndex + 1).toLowerCase()
++      if (KNOWN_EXTENSIONS.has(ext)) return true
++    }
++
++    // Even without an extension in our known list, a path starting with `./`, `../`, `~/`, or having multiple segments
++    if (trimmed.startsWith('./') || trimmed.startsWith('../') || trimmed.startsWith('~/') || trimmed.startsWith('/')) {
++      return true
++    }
++
++    // E.g. docs/evidence/something or src/client/module
++    const segments = trimmed.split(/[\\/]/).filter(Boolean)
++    if (segments.length >= 2 && segments.every(s => !s.includes(' '))) {
++      return true
++    }
++  }
++
++  // Feature 3: Single filename without path separator but with a recognized extension
++  const dotIndex = trimmed.lastIndexOf('.')
++  if (dotIndex > 0 && dotIndex < trimmed.length - 1) {
++    const ext = trimmed.slice(dotIndex + 1).toLowerCase()
++    if (KNOWN_EXTENSIONS.has(ext)) {
++      // Must not contain spaces in standalone filename
++      if (!trimmed.includes(' ')) {
++        return true
++      }
++    }
++  }
++
++  return false
++}
++
++/**
++ * Determine whether a path looks like a directory rather than a file.
++ *
++ * Directories do not have editor content and should be opened in the explorer/file tree
++ * rather than an editor tab.
++ */
++export function isDirectoryPath(path: string): boolean {
++  if (!path || typeof path !== 'string') return false
++  const trimmed = path.trim().replace(/[\\/]+$/, '')
++  if (trimmed === '.' || trimmed === './' || /[\\/]\.$/.test(trimmed)) return true
++  if (path.trim().endsWith('/') || path.trim().endsWith('\\')) return true
++
++  const lastSegment = trimmed.split(/[\\/]/).pop() || ''
++  const lower = lastSegment.toLowerCase()
++  if (KNOWN_EXACT_FILES.has(lower)) return false
++
++  // Leading dot without further extension (e.g. .github, .worktrees, .dsh)
++  if (lastSegment.startsWith('.') && !lastSegment.slice(1).includes('.')) {
++    return true
++  }
++
++  // If the last segment has no dot at all, it is a directory name
++  if (!lastSegment.includes('.')) return true
++
++  return false
++}
+diff --git a/src/client/changes/DiffPane.tsx b/src/client/changes/DiffPane.tsx
+index 8f65370..d33a964 100644
+--- a/src/client/changes/DiffPane.tsx
++++ b/src/client/changes/DiffPane.tsx
+@@ -20,12 +20,12 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
+ import { IconCloseOutlineRegular, IconRefreshOutlineRegular, IconRightUpOutlineRegular, MarkdownDelegateProvider, MarkdownText } from '@deepseek-ai/dsh-client-ui-primitives'
+ import type { Context } from '../../context-types.ts'
+ import type { SessionScope } from '../api.ts'
+-import { api, htmlUrl } from '../api.ts'
++import { api } from '../api.ts'
+ import { hostTransportBase } from '../desktop-env.ts'
+ import { t } from '../locales.ts'
+ import { baseName } from '../paths.ts'
+ import { resolveSidebarPath } from '../paths.ts'
+-import { HTML_IFRAME_SANDBOX } from '../html-preview.ts'
++import { HtmlPreview } from '../HtmlPreview.tsx'
+ import type { SidebarDiffRef, SidebarTab } from '../state.ts'
+ import { DiffRows, ReadRows } from '../diff/DiffRows.tsx'
+ import { PdfView } from '../PdfView.tsx'
+@@ -90,22 +90,9 @@ function diffOf(op: FileOp, prior: string | undefined): readonly DiffRow[] {
+   return []
+ }
+
+-/** The render view of one html op target: the route-src iframe. Extracted
+- *  (and exported) so the always-sandboxed contract is pinned directly by the
+- *  sandbox spec — this surface has NO no-sandbox escape hatch. */
+-export function HtmlRenderPreview(props: { src: string; title: string }) {
+-  return (
+-    <div className={css.htmlPane}>
+-      <iframe
+-        className={css.htmlFrame}
+-        title={props.title}
+-        src={props.src}
+-        sandbox={HTML_IFRAME_SANDBOX}
+-        referrerPolicy="no-referrer"
+-        allow=""
+-      />
+-    </div>
+-  )
++/** Saved HTML uses the same immutable isolation boundary as the editor. */
++export function HtmlRenderPreview(props: { scope: SessionScope; path: string }) {
++  return <div className={css.htmlPane}><HtmlPreview scope={props.scope} path={props.path} className={css.htmlFrame} /></div>
+ }
+
+ /** One header pill toggle — the redaction / reading / render toggles share the
+@@ -430,8 +417,9 @@ export function DiffPane({ target, ctx, scope, height, onHeightCommit, onClose,
+       : ''),
+     [mdOp, contentRaw, contentSrc, scope, contentPath],
+   )
++  // HTML renders the saved file snapshot, not the operation's partial text.
+   const htmlRenderSrc = useMemo(
+-    () => (htmlOp && contentAbs !== '' ? htmlUrl(scope, contentAbs) : ''),
++    () => (htmlOp && contentAbs !== '' ? resolveSidebarPath(scope.cwd, contentAbs) : ''),
+     [htmlOp, scope, contentAbs],
+   )
+
+@@ -542,7 +530,7 @@ export function DiffPane({ target, ctx, scope, height, onHeightCommit, onClose,
+         </div>
+       )
+       : contentView === 'html'
+-        ? <HtmlRenderPreview src={htmlRenderSrc} title={title} />
++        ? <HtmlRenderPreview scope={scope} path={htmlRenderSrc} />
+         : contentView === 'md'
+           ? <MdReadingView text={contentText} ctx={ctx} scope={scope} path={contentPath} />
+           : gitWorktree !== null
+diff --git a/src/client/icons.tsx b/src/client/icons.tsx
+index 7bd6be2..2d06df7 100644
+--- a/src/client/icons.tsx
++++ b/src/client/icons.tsx
+@@ -104,3 +104,19 @@ export const IconVscode16 = ({ size = 16, className }: IconProps) => (
+     <path d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L10.826 12l7.178-5.448v10.896z" />
+   </svg>
+ )
++
++/** Video viewer glyph: a screen rectangle with a play triangle. */
++export const IconVideoOutline16 = ({ size = 16, className }: IconProps) => (
++  <svg width={size} height={size} className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
++    <rect x="1.5" y="2.5" width="13" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
++    <polygon points="6.5 5.5 11 8 6.5 10.5 6.5 5.5" fill="currentColor" />
++  </svg>
++)
++
++/** Audio viewer glyph: a speaker cone with two sound waves. */
++export const IconAudioOutline16 = ({ size = 16, className }: IconProps) => (
++  <svg width={size} height={size} className={className} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
++    <path d="M7.5 2.5 4.5 5.5H2v5h2.5l3 3V2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
++    <path d="M10.5 5.5a3.5 3.5 0 0 1 0 5M12.5 3.5a6.5 6.5 0 0 1 0 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
++  </svg>
++)
+diff --git a/src/client/index.tsx b/src/client/index.tsx
+index ce6d3d3..2d6f769 100644
+--- a/src/client/index.tsx
++++ b/src/client/index.tsx
+@@ -21,7 +21,8 @@ import { createNativeTabRecords } from './native/tab-adapter.tsx'
+ import { registerNativeSurface } from './native/index.ts'
+ import { registerBottomToggle } from './sidebar/bottom-toggle.tsx'
+ import { ContextDiagnosticsHost, createContextDiagnosticsHost, registerContextDiagnosticsUI } from './context-diagnostics-ui.tsx'
+-import { createNativeSurface } from './native/surface.ts'
++import { createNativeSurface, mountedSessions } from './native/surface.ts'
++import { openSidebarFile } from './sidebar-file.ts'
+ import { isTargetAvailable, openInterceptedLink, registerLinkInterception, shouldTakeOverLink } from './link-intercept.ts'
+ import { registerImeGuard } from './ime-guard.ts'
+ import { registerSettingsNavIcon } from './settings-nav-icon.ts'
+@@ -410,6 +411,18 @@ export function apply(ctx: Context): void {
+                 sidebar: ctx.get('betterSidebar'),
+               })
+             },
++            // A relative workspace link has no usable absolute URL, so the
++            // host renders it as inert text; route it to the file surface
++            // before the external-link policy is consulted.
++            openFileInSidebar: (relPath) => {
++              // The session-list snapshot has no current-session field in any
++              // DSH release; the mounted seat is the one that answers (the
++              // same correction Sidebar.tsx makes for #1512).
++              const sessionId = mountedSessions(ctx).getSnapshot()
++              if (sessionId !== undefined) {
++                openSidebarFile(ctx, sessionId, relPath)
++              }
++            },
+             selfOrigin: window.location.origin,
+           })
+         } catch (error) {
+diff --git a/src/client/link-intercept.ts b/src/client/link-intercept.ts
+index f9f87f2..0cd49b4 100644
+--- a/src/client/link-intercept.ts
++++ b/src/client/link-intercept.ts
+@@ -17,6 +17,8 @@
+  * working inside the sidebar).
+  */
+
++import { isCandidateFilePath } from './candidate-paths.ts'
++
+ /** `new URL(value)`, or null for an unparsable href. */
+ function parseUrl(value: string): URL | null {
+   try {
+@@ -45,6 +47,56 @@ export function shouldInterceptLink(anchorHref: string, selfOrigin: string): str
+   return url.href
+ }
+
++/**
++ * Resolve an anchor to a workspace-relative file path, or null when the
++ * target is not a workspace file.
++ *
++ * The host's markdown sanitizer drops every destination that is not
++ * http(s)/mailto, so `[x](./docs/a.png)` renders as inert text with no anchor
++ * at all — the host has no relative-link handler to fall through to. This is
++ * the recognizer for that gap: explicit `./`/`../` syntax, a bare candidate
++ * path, and an anchor the browser resolved against the GUI's own origin
++ * (which is what a relative href looks like once `.href` is read).
++ */
++export function shouldInterceptRelativeFile(
++  rawHref: string | null,
++  anchorHref: string,
++  selfOrigin: string,
++): string | null {
++  if (rawHref === null) return null
++  const trimmed = rawHref.trim()
++  if (trimmed === '' || trimmed.startsWith('#')) return null
++
++  // 1. Explicit relative syntax: `./foo.png`
++  if (trimmed.startsWith('./')) {
++    return trimmed.slice(2)
++  }
++  if (trimmed.startsWith('../')) {
++    return trimmed
++  }
++
++  // 2. A candidate path with no web protocol.
++  if (!trimmed.includes('://') && isCandidateFilePath(trimmed)) {
++    return trimmed.replace(/^\/+/, '')
++  }
++
++  // 3. An anchor resolved against the GUI origin, e.g.
++  //    `http://127.0.0.1:43120/docs/demo.png`.
++  try {
++    const url = new URL(anchorHref)
++    if (url.origin === new URL(selfOrigin).origin) {
++      const pathname = decodeURIComponent(url.pathname.replace(/^\/+/, ''))
++      if (isCandidateFilePath(pathname)) {
++        return pathname
++      }
++    }
++  } catch {
++    // Unparsable (never in practice): not a relative file.
++  }
++
++  return null
++}
++
+ /** Whether a left-click may be taken over (unmodified left click only). */
+ export function isPlainLeftClick(event: { button: number; metaKey: boolean; ctrlKey: boolean; shiftKey: boolean; altKey: boolean }): boolean {
+   return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+@@ -120,6 +172,9 @@ export function registerLinkInterception(opts: {
+   /** Open the URL — the caller resolves the claimed type and falls back to a
+    *  real browser tab when it is gone ({@link openInterceptedLink}). */
+   openInSidebar: (url: string) => void
++  /** Open a workspace-relative link target in the sidebar's file surface.
++   *  Omitted → relative links stay inert, exactly as the host renders them. */
++  openFileInSidebar?: (path: string) => void
+   /** The GUI's own origin (window.location.origin at registration). */
+   selfOrigin: string
+ }): () => void {
+@@ -130,6 +185,14 @@ export function registerLinkInterception(opts: {
+     if (target === null || typeof (target as Element).closest !== 'function') return
+     const anchor = (target as Element).closest('a[href]') as HTMLAnchorElement | null
+     if (anchor === null) return
++    // A relative workspace link has no usable absolute URL, so it never
++    // reaches the external-link policy: route it to the file surface first.
++    const relative = shouldInterceptRelativeFile(anchor.getAttribute('href'), anchor.href, opts.selfOrigin)
++    if (relative !== null && opts.openFileInSidebar !== undefined) {
++      event.preventDefault()
++      opts.openFileInSidebar(relative)
++      return
++    }
+     const url = shouldInterceptLink(anchor.href, opts.selfOrigin)
+     if (url === null) return
+     if (!opts.takeoverEnabled(new URL(url))) return
+diff --git a/src/client/locales-ar.ts b/src/client/locales-ar.ts
+index 872dd9e..927b9e9 100644
+--- a/src/client/locales-ar.ts
++++ b/src/client/locales-ar.ts
+@@ -379,6 +379,8 @@ export const ar: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'كود',
+   viewerHtml: 'HTML',
++  viewerVideo: 'فيديو',
++  viewerAudio: 'صوت',
+   viewerJsonl: 'JSONL',
+   browser: 'المتصفح',
+   browserPlaceholder: 'أدخل عنوان URL، مثل example.com',
+diff --git a/src/client/locales-de.ts b/src/client/locales-de.ts
+index 04648f4..8faa317 100644
+--- a/src/client/locales-de.ts
++++ b/src/client/locales-de.ts
+@@ -364,6 +364,8 @@ export const de: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Code',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Browser',
+   browserPlaceholder: 'URL eingeben, z. B. example.com',
+diff --git a/src/client/locales-fr.ts b/src/client/locales-fr.ts
+index 880125d..bff38a4 100644
+--- a/src/client/locales-fr.ts
++++ b/src/client/locales-fr.ts
+@@ -371,6 +371,8 @@ export const fr: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Code',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Vidéo',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Navigateur',
+   browserPlaceholder: 'Saisissez une adresse, ex. example.com',
+diff --git a/src/client/locales-hi.ts b/src/client/locales-hi.ts
+index 4024af9..6d7f07c 100644
+--- a/src/client/locales-hi.ts
++++ b/src/client/locales-hi.ts
+@@ -378,6 +378,8 @@ export const hi: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'कोड',
+   viewerHtml: 'HTML',
++  viewerVideo: 'वीडियो',
++  viewerAudio: 'ऑडियो',
+   viewerJsonl: 'JSONL',
+   browser: 'ब्राउज़र',
+   browserPlaceholder: 'URL दर्ज करें, जैसे example.com',
+diff --git a/src/client/locales-id.ts b/src/client/locales-id.ts
+index f698faf..b5e3d06 100644
+--- a/src/client/locales-id.ts
++++ b/src/client/locales-id.ts
+@@ -376,6 +376,8 @@ export const id: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Kode',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Browser',
+   browserPlaceholder: 'Masukkan URL, mis. example.com',
+diff --git a/src/client/locales-it.ts b/src/client/locales-it.ts
+index 2c8691b..2c6eadd 100644
+--- a/src/client/locales-it.ts
++++ b/src/client/locales-it.ts
+@@ -369,6 +369,8 @@ export const it: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Codice',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Browser',
+   browserPlaceholder: 'Inserisca un URL, es. example.com',
+diff --git a/src/client/locales-ja.ts b/src/client/locales-ja.ts
+index 30c6eb5..c6c597d 100644
+--- a/src/client/locales-ja.ts
++++ b/src/client/locales-ja.ts
+@@ -378,6 +378,8 @@ export const ja: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'コード',
+   viewerHtml: 'HTML',
++  viewerVideo: '動画',
++  viewerAudio: '音声',
+   viewerJsonl: 'JSONL',
+   browser: 'ブラウザー',
+   browserPlaceholder: 'URL を入力、例: example.com',
+diff --git a/src/client/locales-ko.ts b/src/client/locales-ko.ts
+index cbd47d3..16531c1 100644
+--- a/src/client/locales-ko.ts
++++ b/src/client/locales-ko.ts
+@@ -370,6 +370,8 @@ export const ko: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: '코드',
+   viewerHtml: 'HTML',
++  viewerVideo: '동영상',
++  viewerAudio: '오디오',
+   viewerJsonl: 'JSONL',
+   browser: '브라우저',
+   browserPlaceholder: 'URL 입력, 예: example.com',
+diff --git a/src/client/locales-nl.ts b/src/client/locales-nl.ts
+index c40b00a..3eb4ffb 100644
+--- a/src/client/locales-nl.ts
++++ b/src/client/locales-nl.ts
+@@ -376,6 +376,8 @@ export const nl: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Code',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Browser',
+   browserPlaceholder: 'Voer een URL in, bijv. example.com',
+diff --git a/src/client/locales-pl.ts b/src/client/locales-pl.ts
+index c4f0a66..6155062 100644
+--- a/src/client/locales-pl.ts
++++ b/src/client/locales-pl.ts
+@@ -380,6 +380,8 @@ export const pl: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Kod',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Wideo',
++  viewerAudio: 'Dźwięk',
+   viewerJsonl: 'JSONL',
+   browser: 'Przeglądarka',
+   browserPlaceholder: 'Wpisz adres URL, np. example.com',
+diff --git a/src/client/locales-pt.ts b/src/client/locales-pt.ts
+index 22c0003..b862c0f 100644
+--- a/src/client/locales-pt.ts
++++ b/src/client/locales-pt.ts
+@@ -361,6 +361,8 @@ export const pt: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Código',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Vídeo',
++  viewerAudio: 'Áudio',
+   viewerJsonl: 'JSONL',
+   browser: 'Navegador',
+   browserPlaceholder: 'Digite uma URL, ex.: example.com',
+diff --git a/src/client/locales-ru.ts b/src/client/locales-ru.ts
+index 8405d95..7712e27 100644
+--- a/src/client/locales-ru.ts
++++ b/src/client/locales-ru.ts
+@@ -375,6 +375,8 @@ export const ru: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Код',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Видео',
++  viewerAudio: 'Аудио',
+   viewerJsonl: 'JSONL',
+   browser: 'Браузер',
+   browserPlaceholder: 'Введите URL, например example.com',
+diff --git a/src/client/locales-sv.ts b/src/client/locales-sv.ts
+index 062e87e..7b7df85 100644
+--- a/src/client/locales-sv.ts
++++ b/src/client/locales-sv.ts
+@@ -361,6 +361,8 @@ export const sv: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Kod',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Ljud',
+   viewerJsonl: 'JSONL',
+   browser: 'Webbläsare',
+   browserPlaceholder: 'Ange en URL, t.ex. example.com',
+diff --git a/src/client/locales-th.ts b/src/client/locales-th.ts
+index 5795e7d..51b2bfd 100644
+--- a/src/client/locales-th.ts
++++ b/src/client/locales-th.ts
+@@ -378,6 +378,8 @@ export const th: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'โค้ด',
+   viewerHtml: 'HTML',
++  viewerVideo: 'วิดีโอ',
++  viewerAudio: 'เสียง',
+   viewerJsonl: 'JSONL',
+   browser: 'เบราว์เซอร์',
+   browserPlaceholder: 'กรอก URL เช่น example.com',
+diff --git a/src/client/locales-tr.ts b/src/client/locales-tr.ts
+index a16b16d..4ffb9ff 100644
+--- a/src/client/locales-tr.ts
++++ b/src/client/locales-tr.ts
+@@ -378,6 +378,8 @@ export const tr: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Kod',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Ses',
+   viewerJsonl: 'JSONL',
+   browser: 'Tarayıcı',
+   browserPlaceholder: 'Bir URL girin, örn. example.com',
+diff --git a/src/client/locales-vi.ts b/src/client/locales-vi.ts
+index d7329f3..e56c92c 100644
+--- a/src/client/locales-vi.ts
++++ b/src/client/locales-vi.ts
+@@ -378,6 +378,8 @@ export const vi: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Mã',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Âm thanh',
+   viewerJsonl: 'JSONL',
+   browser: 'Trình duyệt',
+   browserPlaceholder: 'Nhập URL, vd: example.com',
+diff --git a/src/client/locales-zh-HK.ts b/src/client/locales-zh-HK.ts
+index 1de30f7..c76789b 100644
+--- a/src/client/locales-zh-HK.ts
++++ b/src/client/locales-zh-HK.ts
+@@ -393,6 +393,8 @@ export const zhHK: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: '程式碼',
+   viewerHtml: 'HTML',
++  viewerVideo: '影片',
++  viewerAudio: '音訊',
+   viewerJsonl: 'JSONL',
+   browser: '瀏覽器',
+   browserPlaceholder: '輸入網址，例如 example.com',
+diff --git a/src/client/locales-zh-MO.ts b/src/client/locales-zh-MO.ts
+index dd8f514..08245b2 100644
+--- a/src/client/locales-zh-MO.ts
++++ b/src/client/locales-zh-MO.ts
+@@ -393,6 +393,8 @@ export const zhMO: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: '程式碼',
+   viewerHtml: 'HTML',
++  viewerVideo: '影片',
++  viewerAudio: '音訊',
+   viewerJsonl: 'JSONL',
+   browser: '瀏覽器',
+   browserPlaceholder: '輸入網址，例如 example.com',
+diff --git a/src/client/locales-zh-TW.ts b/src/client/locales-zh-TW.ts
+index 79ea093..aa05ed3 100644
+--- a/src/client/locales-zh-TW.ts
++++ b/src/client/locales-zh-TW.ts
+@@ -393,6 +393,8 @@ export const zhTW: Record<string, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: '程式碼',
+   viewerHtml: 'HTML',
++  viewerVideo: '影片',
++  viewerAudio: '音訊',
+   viewerJsonl: 'JSONL',
+   browser: '瀏覽器',
+   browserPlaceholder: '輸入網址，例如 example.com',
+diff --git a/src/client/locales.ts b/src/client/locales.ts
+index 00f37c4..bdbe966 100644
+--- a/src/client/locales.ts
++++ b/src/client/locales.ts
+@@ -390,6 +390,8 @@ export const zh = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: '代码',
+   viewerHtml: 'HTML',
++  viewerVideo: '视频',
++  viewerAudio: '音频',
+   viewerJsonl: 'JSONL',
+   browser: '浏览器',
+   browserPlaceholder: '输入网址，例如 example.com',
+@@ -1034,6 +1036,8 @@ export const en: Record<keyof typeof zh, string> = {
+   viewerMarkdown: 'Markdown',
+   viewerCode: 'Code',
+   viewerHtml: 'HTML',
++  viewerVideo: 'Video',
++  viewerAudio: 'Audio',
+   viewerJsonl: 'JSONL',
+   browser: 'Browser',
+   browserPlaceholder: 'Enter a URL, e.g. example.com',
+diff --git a/src/client/sidebar.module.css b/src/client/sidebar.module.css
+index b93ec2f..908163e 100644
+--- a/src/client/sidebar.module.css
++++ b/src/client/sidebar.module.css
+@@ -2680,3 +2680,32 @@ body[data-dsh-sidebar-dragging] .bottomPanel {
+   overflow: hidden;
+   text-overflow: ellipsis;
+ }
++
++/* ── Video / audio viewer stages ───────────────────────────────────────── */
++
++/* The media stage centers the player in the editor surface, mirroring
++   .editorImageWrap (the image viewer's container). */
++.mediaStage {
++  flex: 1;
++  min-height: 0;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  overflow: hidden;
++  padding: 16px;
++  background: var(--dsw-alias-bg-base);
++}
++
++.mediaVideo {
++  max-width: 100%;
++  max-height: 100%;
++  border-radius: 8px;
++  background: var(--dsw-alias-bg-mask-1);
++  outline: none;
++}
++
++.mediaAudio {
++  width: 100%;
++  max-width: 450px;
++  outline: none;
++}
+diff --git a/src/file-stream.ts b/src/file-stream.ts
+index bc32538..fce620d 100644
+--- a/src/file-stream.ts
++++ b/src/file-stream.ts
+@@ -43,12 +43,15 @@ export async function streamFileToResponse(
+   size: number,
+   res: SidebarHttpResponse,
+   headers: Record<string, string>,
++  range?: { status: number; window: { start: number; end: number } },
+ ): Promise<void> {
+   // `node:http` boundary cast: the host hands the routes a real ServerResponse,
+   // and the declaration graph deliberately cannot name it (see
+   // context-types.ts). This is the one place the cast is needed.
+   const node = res as unknown as ServerResponse
+-  const stream = createReadStream(path)
++  const stream = range === undefined
++    ? createReadStream(path)
++    : createReadStream(path, { start: range.window.start, end: range.window.end })
+   try {
+     await once(stream, 'open')
+   } catch (error: unknown) {
+@@ -59,7 +62,11 @@ export async function streamFileToResponse(
+       400,
+     )
+   }
+-  res.writeHead(200, { ...headers, 'content-length': String(size) })
++  // A ranged response must NOT carry the whole-file length: `content-length`
++  // is the window's byte count and `content-range` (set by the caller) says
++  // which window that is.
++  const length = range === undefined ? size : range.window.end - range.window.start + 1
++  res.writeHead(range?.status ?? 200, { ...headers, 'content-length': String(length) })
+   try {
+     await pipeline(stream, node)
+   } catch {
+diff --git a/src/html-preview-document.ts b/src/html-preview-document.ts
+new file mode 100644
+index 0000000..efa20d0
+--- /dev/null
++++ b/src/html-preview-document.ts
+@@ -0,0 +1,321 @@
++/** Pure server-side AST serialization of a finite static dependency graph. */
++import { parse, parseFragment, serialize, type DefaultTreeAdapterMap } from 'parse5'
++import * as css from 'css-tree'
++import { init, parse as parseModule } from 'es-module-lexer'
++import { pathToFileURL, fileURLToPath } from 'node:url'
++import { resolve } from 'node:path'
++import { createHash } from 'node:crypto'
++import { PreviewResourceReader, PREVIEW_MAX_BYTES, dataUrl, previewError } from './html-preview-resource.ts'
++import type { PreviewLimits, PreviewSnapshot } from './html-preview-types.ts'
++import { SaxesParser } from 'saxes'
++import { srcsetCandidates, validateImportMeta, verifyIntegrity } from './html-preview-syntax.ts'
++
++type Node = DefaultTreeAdapterMap['node']
++type Element = DefaultTreeAdapterMap['element']
++function elements(node: Node): Element[] {
++  const result: Element[] = []
++  const pending: Node[] = [node]
++  while (pending.length) {
++    const current = pending.pop()!
++    if ('tagName' in current) result.push(current)
++    if ('content' in current) pending.push(current.content)
++    if ('childNodes' in current) for (let index = current.childNodes.length - 1; index >= 0; index--) pending.push(current.childNodes[index]!)
++    if (result.length > 100_000) previewError('budget', 'Preview exceeds the HTML node budget')
++  }
++  return result
++}
++function attributeName(a: Element['attrs'][number]): string { return a.prefix ? `${a.prefix}:${a.name}` : a.name }
++function attr(node: Element, name: string): string | undefined { return node.attrs.find(a => attributeName(a) === name)?.value }
++function setAttr(node: Element, name: string, value: string): void {
++  const found = node.attrs.find(a => attributeName(a) === name)
++  if (found) found.value = value
++  else node.attrs.push({ name, value })
++}
++function text(node: Element): string { return node.childNodes.map(n => 'value' in n ? n.value : '').join('') }
++function setText(node: Element, value: string): void { node.childNodes = [{ nodeName: '#text', value, parentNode: node }] }
++function remove(node: Element): void {
++  if (node.parentNode) node.parentNode.childNodes = node.parentNode.childNodes.filter(n => n !== node)
++}
++
++/** No browser DOM, fetch, evaluation, parent bridge, or persistent resource cache. */
++export class PreviewDocumentBuilder {
++  private readonly completed = new Map<string, string>()
++  private readonly active = new Set<string>()
++  private imports: Record<string, string | null> = Object.create(null)
++  private scopes: Record<string, Record<string, string | null>> = Object.create(null)
++
++  private resolveModule(specifier: string, base: string): string {
++    const urlLike = /^(\.{1,2}\/|\/|[a-z][a-z\d+.-]*:)/i.test(specifier)
++    const normalized = urlLike ? this.url(specifier, base).href : specifier
++    const maps = Object.keys(this.scopes).filter(scope => base === scope || (scope.endsWith('/') && base.startsWith(scope))).sort((a, b) => b.length - a.length).map(scope => this.scopes[scope]!)
++    maps.push(this.imports)
++    for (const map of maps) {
++      const key = Object.keys(map).filter(key => key === normalized || (key.endsWith('/') && normalized.startsWith(key))).sort((a, b) => b.length - a.length)[0]
++      if (key === undefined) continue
++      const target = map[key]
++      if (target === null) previewError('module-specifier', `Import map blocks module: ${specifier.slice(0, 160)}`)
++      if (key.endsWith('/')) {
++        const resolved = this.url(normalized.slice(key.length), target!).href
++        if (!resolved.startsWith(target!)) previewError('import-map-prefix', `Import map prefix escapes its target: ${specifier.slice(0, 160)}`)
++        return resolved
++      }
++      return target!
++    }
++    if (!urlLike) previewError('module-specifier', `Unresolved bare module: ${specifier.slice(0, 160)}`)
++    return normalized
++  }
++  private serializedBytes = 0
++  constructor(private readonly reader: PreviewResourceReader) {}
++
++  private url(specifier: string, base: string): URL {
++    try { return new URL(specifier, base) } catch { return previewError('url', `Invalid static reference: ${specifier.slice(0, 160)}`) }
++  }
++
++  private async resource(specifier: string, base: string, kind: 'asset' | 'css' | 'module' | 'script', depth: number, integrity?: string): Promise<string> {
++    if (specifier.startsWith('#') || specifier === '') return specifier
++    const url = this.url(specifier, base)
++    if (url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'data:' || url.protocol === 'blob:') return url.href
++    if (url.protocol !== 'file:') previewError('protocol', `Unsupported resource protocol: ${url.protocol}`)
++    if (depth > 16) previewError('depth', 'Preview dependency depth exceeds 16')
++    const fragment = url.hash
++    url.hash = ''; url.search = ''
++    const resource = await this.reader.read(fileURLToPath(url))
++    if (integrity) verifyIntegrity(integrity, resource.bytes, specifier)
++    if ((kind === 'css' && resource.mime !== 'text/css') || ((kind === 'module' || kind === 'script') && resource.mime !== 'text/javascript')) previewError('mime', `Unexpected type for ${kind} reference`)
++    // Nested HTML/SVG documents require their own reference serialization, not an arbitrary file bridge.
++    if (resource.mime === 'text/html') previewError('nested-html', `Nested local HTML is unsupported: ${specifier.slice(0, 160)}`)
++    const key = `${kind}:${resource.path}`
++    if (this.active.has(key)) previewError('cycle', `Cyclic ${kind} dependency: ${specifier.slice(0, 160)}`)
++    const cached = this.completed.get(key)
++    if (cached) return cached + fragment
++    this.active.add(key)
++    try {
++      const resourceBase = pathToFileURL(resource.path).href
++      let content: Buffer | string = resource.bytes
++      if (kind === 'css') content = await this.rewriteCss(resource.bytes.toString('utf8'), resourceBase, depth)
++      if (kind === 'module') content = await this.rewriteModule(resource.bytes.toString('utf8'), resourceBase, depth)
++      if (resource.mime === 'image/svg+xml') content = await this.rewriteSvg(resource.bytes.toString('utf8'), resourceBase, depth)
++      const value = dataUrl(resource.mime, content)
++      this.serializedBytes += Buffer.byteLength(value)
++      if (this.serializedBytes > PREVIEW_MAX_BYTES) previewError('budget', 'Serialized dependency graph exceeds the output budget')
++      this.completed.set(key, value)
++      return value + fragment
++    } finally { this.active.delete(key) }
++  }
++
++  private async rewriteSvg(source: string, base: string, depth: number): Promise<string> {
++    const parser = new SaxesParser({ xmlns: true })
++    const chunks: Array<() => Promise<string>> = []
++    const stack: Array<{ base: string; style: boolean }> = []
++    const escape = (value: string): string => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;')
++    const literal = (value: string): void => { chunks.push(async () => value) }
++    parser.on('error', () => previewError('svg', 'Invalid external SVG XML'))
++    parser.on('doctype', () => previewError('svg-doctype', 'External SVG DTD/entities are unsupported'))
++    parser.on('processinginstruction', value => {
++      if (value.target === 'xml-stylesheet') previewError('svg-stylesheet', 'External SVG xml-stylesheet processing instruction is unsupported; use a style element')
++      literal(`<?${value.target} ${value.body}?>`)
++    })
++    parser.on('opentag', node => {
++      if (stack.length > 128 || chunks.length > 100_000) previewError('budget', 'SVG exceeds the node/depth budget')
++      const parentBase = stack.at(-1)?.base ?? base
++      const xmlBase = Object.values(node.attributes).find(a => a.uri === 'http://www.w3.org/XML/1998/namespace' && a.local === 'base')
++      const nodeBase = xmlBase ? this.url(xmlBase.value, parentBase).href : parentBase
++      if (node.local === 'script' && Object.values(node.attributes).some(a => a.local === 'type' && a.value === 'module')) previewError('svg-module', 'External SVG module scripts require a document module graph; use an HTML module entry')
++      stack.push({ base: nodeBase, style: node.local === 'style' })
++      chunks.push(async () => {
++        const attributes: string[] = []
++        const integrity = Object.values(node.attributes).find(a => a.local === 'integrity' && !a.uri)
++        let rewrittenIntegrity = integrity?.value
++        for (const a of Object.values(node.attributes)) {
++          if (a === integrity) continue
++          if (a === xmlBase) continue
++          let value = a.value
++          if (a.local === 'srcset') {
++            const candidates: string[] = []
++            for (const candidate of srcsetCandidates(value)) candidates.push([await this.resource(candidate.url, nodeBase, 'asset', depth + 1), candidate.descriptors].filter(Boolean).join(' '))
++            value = candidates.join(', ')
++          } else if (['src', 'poster'].includes(a.local) || (a.local === 'href' && (!a.uri || a.uri === 'http://www.w3.org/1999/xlink') && node.local !== 'a')) {
++            const stylesheet = node.local === 'link' && Object.values(node.attributes).some(attribute => attribute.local === 'rel' && attribute.value.split(/\s+/).includes('stylesheet'))
++            value = await this.resource(value, nodeBase, node.local === 'script' ? 'script' : stylesheet ? 'css' : 'asset', depth + 1, integrity?.value)
++            if (integrity && this.url(a.value, nodeBase).protocol === 'file:' && value.startsWith('data:')) {
++              const bytes = Buffer.from(value.slice(value.indexOf(',') + 1).split('#')[0]!, 'base64')
++              rewrittenIntegrity = `sha256-${createHash('sha256').update(bytes).digest('base64')}`
++            }
++          } else if (a.local === 'style') value = await this.rewriteCss(value, nodeBase, depth + 1, true)
++          else if (['fill', 'stroke', 'filter', 'clip-path', 'mask', 'marker', 'marker-start', 'marker-mid', 'marker-end', 'cursor'].includes(a.local) && /url\s*\(/i.test(value)) {
++            const declaration = await this.rewriteCss(`${a.local}:${value}`, nodeBase, depth + 1, true)
++            value = declaration.slice(declaration.indexOf(':') + 1)
++          }
++          attributes.push(`${a.name}="${escape(value)}"`)
++        }
++        if (rewrittenIntegrity !== undefined) attributes.push(`integrity="${escape(rewrittenIntegrity)}"`)
++        return `<${node.name}${attributes.length ? ' ' + attributes.join(' ') : ''}>`
++      })
++    })
++    parser.on('closetag', node => { stack.pop(); literal(`</${node.name}>`) })
++    const content = (value: string): void => {
++      const context = stack.at(-1)
++      chunks.push(async () => escape(context?.style ? await this.rewriteCss(value, context.base, depth + 1) : value))
++    }
++    parser.on('text', content)
++    parser.on('cdata', content)
++    parser.on('comment', value => literal(`<!--${value}-->`))
++    parser.write(source).close()
++    const output: string[] = []
++    for (const chunk of chunks) output.push(await chunk())
++    return output.join('')
++  }
++
++  async rewriteCss(source: string, base: string, depth = 0, declaration = false): Promise<string> {
++    const ast = css.parse(source, { context: declaration ? 'declarationList' : 'stylesheet', onParseError: () => previewError('css', 'Unsupported CSS syntax') })
++    const tasks: Array<{ node: css.Url | css.StringNode; kind: 'css' | 'asset' }> = []
++    css.walk(ast, {
++      visit: 'Atrule',
++      enter(node) {
++        if (node.name.toLowerCase() !== 'import' || !node.prelude || node.prelude.type !== 'AtrulePrelude') return
++        const first = node.prelude.children.first
++        if (first?.type === 'String' || first?.type === 'Url') tasks.push({ node: first, kind: 'css' })
++      },
++    })
++    css.walk(ast, { visit: 'Url', enter(node) { if (!tasks.some(task => task.node === node)) tasks.push({ node, kind: 'asset' }) } })
++    for (const task of tasks) task.node.value = await this.resource(task.node.value, base, task.kind, depth + 1)
++    return css.generate(ast)
++  }
++
++  async rewriteModule(source: string, base: string, depth = 0): Promise<string> {
++    await init
++    let imports: ReturnType<typeof parseModule>[0]
++    try { [imports] = parseModule(source) } catch { return previewError('module', 'Cannot parse module references') }
++    const replacements: Array<{ start: number; end: number; value: string }> = []
++    if (imports.some(item => item.d === -2)) validateImportMeta(source)
++    for (const item of imports) {
++      if (item.d === -2) continue
++      if (item.n === undefined) previewError('dynamic-import', 'Non-literal dynamic import is unsupported in a local module')
++      const specifier = this.resolveModule(item.n, base)
++      const rewritten = await this.resource(specifier, base, 'module', depth + 1)
++      replacements.push({ start: item.s, end: item.e, value: item.d >= 0 ? JSON.stringify(rewritten) : rewritten })
++    }
++    for (const replacement of replacements.reverse()) source = source.slice(0, replacement.start) + replacement.value + source.slice(replacement.end)
++    return source
++  }
++
++  async build(path: string): Promise<PreviewSnapshot> {
++    const root = await this.reader.read(path, true)
++    const ast = parse(root.bytes.toString('utf8'))
++    const nodes = elements(ast)
++    let base = pathToFileURL(root.path).href
++    const baseNode = nodes.find(node => node.tagName === 'base' && attr(node, 'href') !== undefined)
++    if (baseNode) base = this.url(attr(baseNode, 'href')!, base).href
++    const maps = nodes.filter(node => node.tagName === 'script' && attr(node, 'type')?.toLowerCase() === 'importmap')
++    if (maps.length > 1) previewError('import-map', 'Multiple import maps are unsupported')
++    const normalizeMap = (input: unknown): Record<string, string | null> => {
++      if (!input || typeof input !== 'object' || Array.isArray(input)) return previewError('import-map', 'Import map mappings must be objects')
++      const output: Record<string, string | null> = Object.create(null)
++      for (const [key, value] of Object.entries(input)) {
++        const normalizedKey = /^(\.{1,2}\/|\/|[a-z][a-z\d+.-]*:)/i.test(key) ? this.url(key, base).href : key
++        if (value === null) { output[normalizedKey] = null; continue }
++        if (typeof value !== 'string') previewError('import-map', `Unsupported import map entry: ${key}`)
++        const target = this.url(value, base).href
++        if (key.endsWith('/') && !target.endsWith('/')) previewError('import-map-prefix', `Prefix target must end in /: ${key}`)
++        output[normalizedKey] = target
++      }
++      return output
++    }
++    for (const node of maps) {
++      let map: { imports?: unknown; scopes?: Record<string, unknown>; integrity?: unknown }
++      try { map = JSON.parse(text(node)) } catch { return previewError('import-map', 'Invalid import map JSON') }
++      if (!map || typeof map !== 'object' || Array.isArray(map)) previewError('import-map', 'Invalid import map')
++      if (map.integrity !== undefined) previewError('import-map-integrity', 'Import-map integrity metadata cannot be remapped to serialized module URLs; use script/link integrity')
++      this.imports = normalizeMap(map.imports ?? {})
++      if (map.scopes !== undefined && (!map.scopes || typeof map.scopes !== 'object' || Array.isArray(map.scopes))) previewError('import-map', 'Import map scopes must be an object')
++      for (const [scope, values] of Object.entries(map.scopes ?? {})) this.scopes[this.url(scope, base).href] = normalizeMap(values)
++    }
++    // Local imports are resolved statically at each original referrer. Only remote
++    // mappings remain useful to native remote module graphs in the opaque frame.
++    const emittedMap = async (map: Record<string, string | null>, remoteScope = false): Promise<Record<string, string | null>> => {
++      const output: Record<string, string | null> = Object.create(null)
++      for (const [key, value] of Object.entries(map)) {
++        if (key.startsWith('file:')) continue
++        if (value === null) { output[key] = null; continue }
++        if (value.startsWith('file:')) {
++          if (key.endsWith('/')) {
++            if (remoteScope) previewError('import-map-prefix', `Remote scope points to a local prefix requiring runtime discovery: ${key}`)
++            continue
++          }
++          output[key] = await this.resource(value, base, 'module', 0)
++        } else output[key] = value
++      }
++      return output
++    }
++    for (const node of maps) {
++      const scopes: Record<string, Record<string, string | null>> = Object.create(null)
++      for (const [scope, values] of Object.entries(this.scopes)) {
++        if (!scope.startsWith('file:')) scopes[scope] = await emittedMap(values, true)
++      }
++      setText(node, JSON.stringify({ imports: await emittedMap(this.imports), scopes }).replaceAll('<', '\\u003c'))
++    }
++    for (const node of nodes) {
++      if (node.tagName === 'base') { remove(node); continue }
++      if (node.tagName === 'object' || node.tagName === 'embed') { remove(node); continue }
++      if (node.tagName === 'style') setText(node, await this.rewriteCss(text(node), base))
++      const style = attr(node, 'style')
++      if (style !== undefined) setAttr(node, 'style', await this.rewriteCss(style, base, 0, true))
++      if (node.namespaceURI === 'http://www.w3.org/2000/svg') {
++        for (const a of node.attrs) {
++          if (['fill', 'stroke', 'filter', 'clip-path', 'mask', 'marker', 'marker-start', 'marker-mid', 'marker-end', 'cursor'].includes(a.name) && /url\s*\(/i.test(a.value)) {
++            const declaration = await this.rewriteCss(`${a.name}:${a.value}`, base, 0, true)
++            a.value = declaration.slice(declaration.indexOf(':') + 1)
++          }
++        }
++      }
++      const type = attr(node, 'type')?.toLowerCase()
++      if (node.tagName === 'script' && type === 'module' && attr(node, 'src') === undefined) setText(node, await this.rewriteModule(text(node), base))
++      for (const name of ['src', 'poster', 'href', 'xlink:href']) {
++        const value = attr(node, name)
++        if (value === undefined) continue
++        const stylesheet = node.tagName === 'link' && attr(node, 'rel')?.split(/\s+/).includes('stylesheet')
++        const modulePreload = node.tagName === 'link' && attr(node, 'rel') === 'modulepreload'
++        const assetHref = node.tagName === 'image' || node.tagName === 'use' || node.tagName === 'feImage'
++        if ((name === 'href' || name === 'xlink:href') && !stylesheet && !modulePreload && !assetHref) {
++          if (node.tagName === 'link' && !value.startsWith('#')) {
++            const url = this.url(value, base)
++            if (url.protocol === 'file:') setAttr(node, name, await this.resource(value, base, 'asset', 0))
++            else setAttr(node, name, url.href)
++          }
++          continue
++        }
++        const kind = stylesheet ? 'css' : modulePreload || (node.tagName === 'script' && type === 'module') ? 'module' : node.tagName === 'script' ? 'script' : 'asset'
++        const rewritten = await this.resource(value, base, kind, 0, attr(node, 'integrity'))
++        setAttr(node, name, rewritten)
++        if (rewritten.startsWith('data:') && !value.startsWith('data:') && attr(node, 'integrity')) {
++          // SRI was checked against original bytes; transformed bytes need a matching digest.
++          const bytes = Buffer.from(rewritten.slice(rewritten.indexOf(',') + 1).split('#')[0]!, 'base64')
++          setAttr(node, 'integrity', `sha256-${createHash('sha256').update(bytes).digest('base64')}`)
++        }
++      }
++      const srcset = attr(node, 'srcset')
++      if (srcset !== undefined) {
++        const output: string[] = []
++        for (const candidate of srcsetCandidates(srcset)) {
++          output.push([await this.resource(candidate.url, base, 'asset', 0), candidate.descriptors].filter(Boolean).join(' '))
++        }
++        setAttr(node, 'srcset', output.join(', '))
++      }
++    }
++    const head = nodes.find(node => node.tagName === 'head')!
++    const policies = parseFragment('<meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="object-src \'none\'; base-uri \'none\'">').childNodes
++    for (const node of policies) node.parentNode = head
++    head.childNodes.unshift(...policies)
++    await this.reader.validate()
++    const html = serialize(ast)
++    const byteLength = Buffer.byteLength(html)
++    if (byteLength > PREVIEW_MAX_BYTES) previewError('budget', 'Preview exceeds the 16 MiB output budget')
++    return { html, revision: this.reader.revision(), warnings: [], resourceCount: this.reader.resources.size, byteLength }
++  }
++}
++
++export async function buildHtmlPreview(workspace: string, path: string, limits: PreviewLimits, signal?: AbortSignal): Promise<PreviewSnapshot> {
++  const reader = new PreviewResourceReader(workspace, limits, signal)
++  try { return await new PreviewDocumentBuilder(reader).build(resolve(workspace, path)) }
++  finally { reader.dispose() }
++}
+diff --git a/src/html-preview-resource.ts b/src/html-preview-resource.ts
+new file mode 100644
+index 0000000..9758d89
+--- /dev/null
++++ b/src/html-preview-resource.ts
+@@ -0,0 +1,93 @@
++/** Bounded, canonical, request-local filesystem reads; never performs network I/O. */
++import { constants } from 'node:fs'
++import { open, stat } from 'node:fs/promises'
++import { extname } from 'node:path'
++import { createHash } from 'node:crypto'
++import { ensureWorkspacePath } from './path-security.ts'
++import { SidebarError } from './wire.ts'
++import type { PreviewLimits } from './html-preview-types.ts'
++
++export const PREVIEW_MAX_BYTES = 16 * 1024 * 1024
++const MIME: Record<string, string> = {
++  '.html': 'text/html', '.htm': 'text/html', '.css': 'text/css',
++  '.js': 'text/javascript', '.mjs': 'text/javascript',
++  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif',
++  '.webp': 'image/webp', '.svg': 'image/svg+xml', '.avif': 'image/avif', '.ico': 'image/x-icon',
++  '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf',
++  '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.m4a': 'audio/mp4',
++  '.mp4': 'video/mp4', '.webm': 'video/webm', '.mov': 'video/quicktime',
++}
++export interface PreviewResource { path: string; mime: string; bytes: Buffer }
++export function previewError(code: string, message: string): never {
++  throw new SidebarError(`preview-${code}`, message, 400)
++}
++export function dataUrl(mime: string, bytes: Buffer | string): string {
++  return `data:${mime};base64,${Buffer.from(bytes).toString('base64')}`
++}
++
++/** Each instance belongs to exactly one snapshot and authorizes no runtime reads. */
++export class PreviewResourceReader {
++  readonly resources = new Map<string, PreviewResource>()
++  private readonly stamps = new Map<string, { dev: number; ino: number; size: number; mtimeMs: number; ctimeMs: number }>()
++  private total = 0
++  private disposed = false
++  constructor(private readonly workspace: string, private readonly limits: PreviewLimits, private readonly signal?: AbortSignal) {}
++
++  async read(target: string, root = false): Promise<PreviewResource> {
++    if (this.disposed || this.signal?.aborted) previewError('cancelled', 'Preview cancelled')
++    if (target.includes('\0')) previewError('path', 'Invalid resource path')
++    const path = await ensureWorkspacePath(this.workspace, target, true)
++    const cached = this.resources.get(path)
++    if (cached) return cached
++    const mime = MIME[extname(path).toLowerCase()]
++    if (!mime || (root && mime !== 'text/html')) previewError('mime', 'Unsupported preview resource type')
++    if (this.resources.size >= 128) previewError('budget', 'Preview exceeds 128 local resources')
++    const limit = Math.min(root ? this.limits.readLimit : this.limits.mediaLimit, PREVIEW_MAX_BYTES - this.total)
++    const before = await stat(path)
++    if (!before.isFile()) previewError('file', 'Preview resource is not a regular file')
++    if (before.size > limit) previewError('budget', 'Preview resource exceeds the byte budget')
++    const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
++    try {
++      const opened = await handle.stat()
++      if (!opened.isFile() || opened.dev !== before.dev || opened.ino !== before.ino) previewError('unstable', 'Preview resource changed while opening')
++      if (await ensureWorkspacePath(this.workspace, path, true) !== path) previewError('unstable', 'Preview resource path changed')
++      const bytes = Buffer.alloc(Math.min(opened.size, limit) + 1)
++      let length = 0
++      while (length < bytes.length) {
++        if (this.disposed || this.signal?.aborted) previewError('cancelled', 'Preview cancelled')
++        const result = await handle.read(bytes, length, bytes.length - length, length)
++        if (!result.bytesRead) break
++        length += result.bytesRead
++      }
++      const after = await handle.stat()
++      const current = await stat(path)
++      if (length > limit) previewError('budget', 'Preview resource exceeds the byte budget')
++      if (length !== opened.size || after.size !== opened.size || after.mtimeMs !== opened.mtimeMs || after.ctimeMs !== opened.ctimeMs
++        || current.ino !== opened.ino || current.dev !== opened.dev || current.mtimeMs !== after.mtimeMs
++        || await ensureWorkspacePath(this.workspace, path, true) !== path) previewError('unstable', 'Preview resource changed during reading')
++      const resource = { path, mime, bytes: bytes.subarray(0, length) }
++      this.total += length
++      this.resources.set(path, resource)
++      this.stamps.set(path, { dev: after.dev, ino: after.ino, size: after.size, mtimeMs: after.mtimeMs, ctimeMs: after.ctimeMs })
++      return resource
++    } finally { await handle.close() }
++  }
++
++  async validate(): Promise<void> {
++    for (const [path, stamp] of this.stamps) {
++      if (this.disposed || this.signal?.aborted) previewError('cancelled', 'Preview cancelled')
++      if (await ensureWorkspacePath(this.workspace, path, true) !== path) previewError('unstable', 'Preview path changed during snapshot construction')
++      const current = await stat(path)
++      if (!current.isFile() || current.dev !== stamp.dev || current.ino !== stamp.ino || current.size !== stamp.size
++        || current.mtimeMs !== stamp.mtimeMs || current.ctimeMs !== stamp.ctimeMs) previewError('unstable', 'Preview resource changed during snapshot construction')
++    }
++  }
++
++  revision(): string {
++    const hash = createHash('sha256')
++    for (const [path, resource] of [...this.resources].sort(([a], [b]) => a.localeCompare(b))) hash.update(path).update('\0').update(resource.bytes)
++    return hash.digest('hex')
++  }
++
++  dispose(): void { this.disposed = true }
++}
+diff --git a/src/html-preview-syntax.ts b/src/html-preview-syntax.ts
+new file mode 100644
+index 0000000..5be5ba5
+--- /dev/null
++++ b/src/html-preview-syntax.ts
+@@ -0,0 +1,88 @@
++import { parse, type Node } from 'acorn'
++import { createHash } from 'node:crypto'
++import { previewError } from './html-preview-resource.ts'
++
++/** Check the strongest supported SRI algorithm, as browsers do. */
++export function verifyIntegrity(metadata: string, bytes: Buffer, reference: string): void {
++  const tokens = metadata.split(/[\t\n\f\r ]+/).flatMap(token => {
++    const match = /^(sha256|sha384|sha512)-([A-Za-z0-9+/_-]+={0,2})(?:\?[^\s]*)?$/.exec(token)
++    return match ? [{ algorithm: match[1]!, digest: match[2]!.replaceAll('-', '+').replaceAll('_', '/').replace(/=+$/, '') }] : []
++  })
++  // Unsupported/invalid metadata does not enforce integrity in the browser.
++  if (!tokens.length) return
++  const strongest = ['sha512', 'sha384', 'sha256'].find(a => tokens.some(t => t.algorithm === a))!
++  const digest = createHash(strongest).update(bytes).digest('base64').replace(/=+$/, '')
++  if (!tokens.some(t => t.algorithm === strongest && t.digest === digest)) previewError('integrity', `Local resource integrity mismatch: ${reference.slice(0, 160)}`)
++}
++
++/** Tokenize srcset URL/descriptor states without splitting data URL commas. */
++export function srcsetCandidates(source: string): Array<{ url: string; descriptors: string }> {
++  const result: Array<{ url: string; descriptors: string }> = []
++  let position = 0
++  const space = (c: string): boolean => /[\t\n\f\r ]/.test(c)
++  while (position < source.length) {
++    while (position < source.length && (space(source[position]!) || source[position] === ',')) position++
++    const start = position
++    while (position < source.length && !space(source[position]!)) position++
++    let url = source.slice(start, position)
++    if (!url) break
++    if (url.endsWith(',')) { url = url.replace(/,+$/, ''); result.push({ url, descriptors: '' }); continue }
++    const descriptorStart = position
++    let parentheses = 0
++    while (position < source.length) {
++      const c = source[position]!
++      if (c === ',' && parentheses === 0) break
++      if (c === '(') parentheses++
++      if (c === ')' && parentheses > 0) parentheses--
++      position++
++    }
++    const descriptors = source.slice(descriptorStart, position).trim()
++    position++
++    const parts = descriptors ? descriptors.split(/[\t\n\f\r ]+/) : []
++    let width = false; let density = false; let height = false; let valid = true
++    for (const part of parts) {
++      if (/^\d+w$/.test(part) && Number(part.slice(0, -1)) > 0 && !width && !density) width = true
++      else if (/^\d+h$/.test(part) && Number(part.slice(0, -1)) > 0 && !height && !density) height = true
++      else if (/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?x$/.test(part) && Number(part.slice(0, -1)) >= 0 && !density && !width && !height) density = true
++      else valid = false
++    }
++    if (height && !width) valid = false
++    // Invalid candidates are ignored by the browser and must not trigger file reads.
++    if (valid) result.push({ url, descriptors })
++  }
++  return result
++}
++
++type SyntaxNode = Node & { [key: string]: unknown }
++/** Inspect only modules containing import.meta; parsing never evaluates source. */
++export function validateImportMeta(source: string): void {
++  let ast: Node
++  try { ast = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }) }
++  catch { return previewError('module', 'Cannot parse module containing import.meta') }
++  function visit(node: SyntaxNode, ancestors: SyntaxNode[]): void {
++    if (node.type === 'MetaProperty') {
++      const parent = ancestors.at(-1)
++      const property = parent?.property as SyntaxNode | undefined
++      const member = parent?.type === 'MemberExpression' && parent.object === node
++      const name = member ? (parent.computed ? property?.value : property?.name) : undefined
++      if (!member || typeof name !== 'string') previewError('import-meta-escape', 'Aliased or computed import.meta cannot preserve local runtime resolution')
++      if (name === 'resolve') previewError('import-meta-resolve', 'Local import.meta.resolve requires a runtime resolver; use a literal import')
++      if (name === 'url') {
++        const consumer = ancestors.at(-2)
++        const callee = consumer?.callee as SyntaxNode | undefined
++        const args = consumer?.arguments as SyntaxNode[] | undefined
++        const absoluteUrl = consumer?.type === 'NewExpression' && callee?.name === 'URL' && typeof args?.[0]?.value === 'string' && /^[a-z][a-z\d+.-]*:/i.test(args[0].value)
++        const consoleCall = consumer?.type === 'CallExpression' && callee?.type === 'MemberExpression' && (callee.object as SyntaxNode)?.name === 'console'
++        if (!absoluteUrl && !consoleCall && consumer?.type !== 'UnaryExpression' && consumer?.type !== 'BinaryExpression' && consumer?.type !== 'ExpressionStatement') {
++          previewError('import-meta-url', 'Relative URL construction or escaping import.meta.url cannot preserve the local resource base; use a static import/reference')
++        }
++      }
++    }
++    for (const value of Object.values(node)) {
++      if (Array.isArray(value)) {
++        for (const child of value) { if (child && typeof child === 'object' && typeof child.type === 'string') visit(child as SyntaxNode, [...ancestors, node]) }
++      } else if (value && typeof value === 'object' && 'type' in value && typeof value.type === 'string') visit(value as SyntaxNode, [...ancestors, node])
++    }
++  }
++  visit(ast as SyntaxNode, [])
++}
+diff --git a/src/html-preview-types.ts b/src/html-preview-types.ts
+new file mode 100644
+index 0000000..d7f636e
+--- /dev/null
++++ b/src/html-preview-types.ts
+@@ -0,0 +1,10 @@
++/** Serializable output of one authorized, saved-file preview. */
++export interface PreviewWarning { code: string; message: string }
++export interface PreviewSnapshot {
++  html: string
++  revision: string
++  warnings: PreviewWarning[]
++  resourceCount: number
++  byteLength: number
++}
++export interface PreviewLimits { readLimit: number; mediaLimit: number }
+diff --git a/src/index.ts b/src/index.ts
+index feb3095..7c54c23 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -33,6 +33,7 @@ import { ensureWorkspacePath } from './path-security.ts'
+ import { searchFiles } from './fs-search.ts'
+ import { compileExcludePatterns } from './exclude-patterns.ts'
+ import { decodeHtmlUrl } from './html-route.ts'
++import { buildHtmlPreview } from './html-preview-document.ts'
+ import { registerBundleRoute } from './bundle-route.ts'
+ import { createDirectoryWatchers, type DirectoryWatchers } from './fs-watch.ts'
+ import { createSidechatPushHub } from './sidechat-push.ts'
+@@ -125,6 +126,27 @@ const MEDIA_TYPES: Record<string, string> = {
+   '.pdf': 'application/pdf',
+   '.html': 'text/html',
+   '.htm': 'text/html',
++  // Stylesheet / script / font types a previewed page links to (the fenced
++  // asset route serves them alongside the document).
++  '.css': 'text/css; charset=utf-8',
++  '.js': 'text/javascript; charset=utf-8',
++  '.mjs': 'text/javascript; charset=utf-8',
++  '.woff': 'font/woff',
++  '.woff2': 'font/woff2',
++  '.ttf': 'font/ttf',
++  '.otf': 'font/otf',
++  '.mp4': 'video/mp4',
++  '.webm': 'video/webm',
++  '.mov': 'video/quicktime',
++  '.m4v': 'video/x-m4v',
++  '.ogv': 'video/ogg',
++  '.mp3': 'audio/mpeg',
++  '.wav': 'audio/wav',
++  '.flac': 'audio/flac',
++  '.ogg': 'audio/ogg',
++  '.m4a': 'audio/mp4',
++  '.opus': 'audio/opus',
++  '.aac': 'audio/aac',
+ }
+
+ /** Content type served by /sidebar/file (binary-safe fallback for unknowns). */
+@@ -132,6 +154,53 @@ export function mediaTypeForPath(path: string): string {
+   return MEDIA_TYPES[extname(path).toLowerCase()] ?? 'application/octet-stream'
+ }
+
++/**
++ * Per-resource ceiling the HTML preview builder reads with. 0.28.1 retired the
++ * configurable `readLimit`/`mediaLimit` because every byte route streams, but
++ * the preview snapshot inlines its assets as data URLs, so it still needs a
++ * bound: PREVIEW_MAX_BYTES caps the whole graph, this caps one resource.
++ */
++const PREVIEW_LIMITS = { readLimit: 8 * 1024 * 1024, mediaLimit: 16 * 1024 * 1024 } as const
++
++/** Video/audio extensions the media route plays by byte range. */
++const STREAMABLE_MEDIA_EXTS = new Set([
++  '.mp4', '.webm', '.mov', '.m4v', '.ogv',
++  '.mp3', '.wav', '.flac', '.ogg', '.m4a', '.opus', '.aac',
++])
++
++/** Whether the path is a video/audio file (streamed rather than buffered). */
++function isStreamableMedia(path: string): boolean {
++  return STREAMABLE_MEDIA_EXTS.has(extname(path).toLowerCase())
++}
++
++/**
++ * Parse a single `bytes=` range header into an inclusive window over `size`.
++ * Handles the `start-end`, `start-` and suffix (`-N`) forms; multi-range
++ * requests and malformed or unsatisfiable windows return null, which the
++ * caller answers with the ordinary 200 body.
++ */
++export function parseByteRange(header: string, size: number): { start: number; end: number } | null {
++  const match = /^bytes=(\d*)-(\d*)$/.exec(header.trim())
++  if (match === null) return null
++  const [, rawStart, rawEnd] = match
++  if (rawStart === '' && rawEnd === '') return null
++  let start: number
++  let end: number
++  if (rawStart === '') {
++    // Suffix form: the final N bytes.
++    const suffix = Number(rawEnd)
++    if (!Number.isSafeInteger(suffix) || suffix <= 0) return null
++    start = Math.max(size - suffix, 0)
++    end = size - 1
++  } else {
++    start = Number(rawStart)
++    end = rawEnd === '' ? size - 1 : Number(rawEnd)
++  }
++  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end)) return null
++  if (start < 0 || start >= size || end < start) return null
++  return { start, end: Math.min(end, size - 1) }
++}
++
+ /**
+  * Resolve the committed execution directory before client or original-header
+  * hints. Live reads are synchronous; detached reads use the host observation
+@@ -782,6 +851,18 @@ function buildApi(
+       const query = requireString(payload, 'query')
+       return searchFiles(cwd, query, { exclude: compileExcludePatterns(record.exclude, cwd) })
+     },
++    // The HTML preview snapshot. The untrusted preview frame is an opaque
++    // origin the /sidebar/html route cannot serve (its trust fence rejects
++    // sandboxed frames), so the trusted main GUI asks HERE for a fully
++    // self-contained document and hands the frame a string instead of a URL.
++    'html.preview': async (payload, signal) => {
++      const { cwd } = await cwdOf(payload)
++      // 0.28.1 retired the configurable read/media caps: the routes stream now,
++      // so a byte cap protects nothing. The preview builder still needs a
++      // per-resource ceiling to stop one 4 GB asset from being base64'd into
++      // the snapshot; PREVIEW_MAX_BYTES bounds the whole graph regardless.
++      return buildHtmlPreview(cwd, requireString(payload, 'path'), PREVIEW_LIMITS, signal)
++    },
+     'fs.read': async (payload) => {
+       const { cwd } = await cwdOf(payload)
+       // Relative paths are git-derived (status/diff report repo-root-relative
+@@ -1498,7 +1579,7 @@ export function apply(ctx: Context, config?: SidebarConfig): void {
+         writeError(res, new SidebarError('not-found', 'unknown sidebar API method', 404))
+         return
+       }
+-      const controller = method === 'changes.ops' ? new AbortController() : undefined
++      const controller = method === 'changes.ops' || method === 'html.preview' ? new AbortController() : undefined
+       const response = controller === undefined ? undefined : res as ServerResponse
+       const abort = (): void => { controller?.abort() }
+       response?.once('close', abort)
+@@ -1695,6 +1776,18 @@ export function apply(ctx: Context, config?: SidebarConfig): void {
+         if (url.searchParams.get('download') === '1') {
+           headers['content-disposition'] = `attachment; filename*=UTF-8''${encodeURIComponent(basename(path))}`
+         }
++        // A video/audio player seeks inside its source, so the route has to
++        // answer a single `bytes=` window with 206 instead of forcing the
++        // whole body. `accept-ranges` is advertised on every response so the
++        // media viewers know seeking is available.
++        headers['accept-ranges'] = 'bytes'
++        const range = req.headers.range
++        const window = typeof range === 'string' ? parseByteRange(range, info.size) : null
++        if (window !== null) {
++          headers['content-range'] = `bytes ${String(window.start)}-${String(window.end)}/${String(info.size)}`
++          await streamFileToResponse(path, info.size, res, headers, { status: 206, window })
++          return
++        }
+         // Streamed, not buffered: there is no size gate left, and the host's
+         // memory stays flat whatever the file weighs (see file-stream.ts).
+         await streamFileToResponse(path, info.size, res, headers)
+diff --git a/src/wire.ts b/src/wire.ts
+index b35477f..a777a1f 100644
+--- a/src/wire.ts
++++ b/src/wire.ts
+@@ -12,6 +12,7 @@ import { GitCommandError } from './git.ts'
+
+ /** Machine-readable error codes of the sidebar API. */
+ export type SidebarErrorCode =
++  | `preview-${string}`
+   | 'bad-request'
+   | 'not-found'
+   | 'forbidden'
+diff --git a/tests/builtins.spec.ts b/tests/builtins.spec.ts
+index 4cf50f9..68bd61e 100644
+--- a/tests/builtins.spec.ts
++++ b/tests/builtins.spec.ts
+@@ -324,10 +324,12 @@ describe('side chat close archives the bound thread', () => {
+ })
+
+ describe('built-in file viewer registrations', () => {
+-  it('registers the 4 built-in file viewers (the read-only previews yielded to the host)', () => {
++  it('registers the 6 built-in file viewers (the read-only previews yielded to the host)', () => {
+     const { service } = setup()
++    // audio + video are this build's own additions: the host's document
++    // preview has no player, so the media surfaces stay here.
+     expect(service.getFileViewers().map(v => v.id).sort()).toEqual(
+-      ['code', 'html', 'jsonl', 'markdown'],
++      ['audio', 'code', 'html', 'jsonl', 'markdown', 'video'],
+     )
+     // The yielded ids are gone: the host's own document preview
+     // (ui-sidebar-documentpreview) owns images, pdf, spreadsheets, office
+@@ -393,14 +395,14 @@ describe('built-in file viewer registrations', () => {
+     expect(service.matchFileViewer('package.json')?.id).toBe('code')
+   })
+
+-  it('the html viewer declares its sandbox and default-unsafe related settings', () => {
++  it('the html viewer declares NO sandbox escape hatch (the boundary is fixed)', () => {
+     const { service } = setup()
+     const toggles = service.getFileViewers().find(v => v.id === 'html')?.settings?.toggles ?? []
+-    expect(toggles.map(t => t.key)).toEqual(['htmlViewerNoSandbox', 'htmlViewerDefaultUnsafe'])
+-    expect(toggles[0]?.title).toBeDefined()
+-    expect(toggles[0]?.desc).toBeDefined()
+-    expect(toggles[1]?.title).toBeDefined()
+-    expect(toggles[1]?.desc).toBeDefined()
++    // A persisted legacy htmlViewerNoSandbox / htmlViewerDefaultUnsafe key is
++    // inert: there is no switch to widen the sandbox with.
++    expect(toggles.map(t => t.key)).not.toContain('htmlViewerNoSandbox')
++    expect(toggles.map(t => t.key)).not.toContain('htmlViewerDefaultUnsafe')
++    expect(toggles).toEqual([])
+   })
+
+   it('the jsonl viewer carries the code viewer\'s single git-gutter toggle', () => {
+diff --git a/tests/sandbox-views.spec.tsx b/tests/sandbox-views.spec.tsx
+index 8b748c8..e2e5849 100644
+--- a/tests/sandbox-views.spec.tsx
++++ b/tests/sandbox-views.spec.tsx
+@@ -14,7 +14,7 @@ import './browser-globals.ts'
+ import type { Context } from '../src/context-types.ts'
+ import { TextEditor } from '../src/client/TextEditor.tsx'
+ import { HTML_IFRAME_SANDBOX } from '../src/client/html-preview.ts'
+-import { DiffPane, HtmlRenderPreview } from '../src/client/changes/DiffPane.tsx'
++import { DiffPane } from '../src/client/changes/DiffPane.tsx'
+ import { createSidebarStore } from '../src/client/state.ts'
+ import type { FileViewerProps } from '../src/client/service.ts'
+
+@@ -40,60 +40,23 @@ function viewerProps(store: ReturnType<typeof createSidebarStore>, overrides: Pa
+ }
+
+ describe('HTML preview iframe sandbox', () => {
+-  it('renders the preview iframe with the exact sandbox tokens and no same-origin / top-navigation', () => {
+-    const store = createSidebarStore()
+-    const html = renderToString(createElement(TextEditor, viewerProps(store)))
+-    const iframe = /<iframe[^>]*>/.exec(html)?.[0]
+-    expect(iframe).toBeDefined()
+-    // The sandbox tokens are exactly the exported constant...
+-    expect(iframe).toContain(`sandbox="${HTML_IFRAME_SANDBOX}"`)
+-    // ...which must never contain the dangerous tokens.
++  it('no persisted preference can widen the sandbox: the escape hatch is gone', () => {
++    // Both legacy keys still exist in the prefs shape (a stored profile keeps
++    // them), so the test sets them and proves they change nothing: the editor
++    // no longer reads either one.
++    for (const legacy of [{ htmlViewerNoSandbox: true }, { htmlViewerDefaultUnsafe: true }]) {
++      const store = createSidebarStore()
++      store.setPrefs({ ...store.getPrefs(), ...legacy })
++      const html = renderToString(createElement(TextEditor, viewerProps(store)))
++      // No status row, no unlock affordance, no warning bar.
++      expect(html).not.toContain('沙箱模式：已启用')
++      expect(html).not.toContain('临时解锁')
++      expect(html).not.toContain('沙箱已关闭')
++      expect(html).not.toContain('恢复沙箱')
++    }
++    // The constant the frame is built with stays exactly as narrow.
+     expect(HTML_IFRAME_SANDBOX).not.toContain('allow-same-origin')
+     expect(HTML_IFRAME_SANDBOX).not.toContain('allow-top-navigation')
+-    // Cross-origin framing by construction: route-src (never srcdoc).
+-    expect(iframe).toContain('src="http://localhost/sidebar/html/s1/p/a/index.html"')
+-    expect(iframe).not.toContain('srcdoc=')
+-    // Referrer + permissions policy stay locked even when sandboxed.
+-    // (React SSR renders the referrerPolicy prop camelCase as written.)
+-    expect(iframe).toContain('referrerPolicy="no-referrer"')
+-    expect(iframe).toContain('allow=""')
+-  })
+-
+-  it('renders the live sandbox status row (green on + temporary unlock action)', () => {
+-    const store = createSidebarStore()
+-    const html = renderToString(createElement(TextEditor, viewerProps(store)))
+-    // Sandbox ON: the green status + the one-tap temporary unlock button.
+-    expect(html).toContain('沙箱模式：已启用')
+-    expect(html).toContain('临时解锁（不安全）')
+-    // No restore action while the sandbox is on.
+-    expect(html).not.toContain('恢复沙箱')
+-  })
+-
+-  it('drops the sandbox attribute with the red warning when the setting is on (no restore action — the global setting owns it)', () => {
+-    const store = createSidebarStore()
+-    store.setPrefs({ ...store.getPrefs(), htmlViewerNoSandbox: true })
+-    const html = renderToString(createElement(TextEditor, viewerProps(store)))
+-    const iframe = /<iframe[^>]*>/.exec(html)?.[0]
+-    expect(iframe).toBeDefined()
+-    expect(iframe).not.toContain('sandbox=')
+-    // The red persistent warning copy is rendered; the temporary-unlock
+-    // action is NOT offered (re-enabling is the settings page's job).
+-    expect(html).toContain('沙箱已关闭')
+-    expect(html).not.toContain('临时解锁（不安全）')
+-    expect(html).not.toContain('恢复沙箱')
+-  })
+-
+-  it('starts unsandboxed (red, restorable) when the default-unsafe pref is on', () => {
+-    const store = createSidebarStore()
+-    store.setPrefs({ ...store.getPrefs(), htmlViewerDefaultUnsafe: true })
+-    const html = renderToString(createElement(TextEditor, viewerProps(store)))
+-    const iframe = /<iframe[^>]*>/.exec(html)?.[0]
+-    expect(iframe).toBeDefined()
+-    expect(iframe).not.toContain('sandbox=')
+-    // The red warning + the one-tap restore (this is the LOCAL state).
+-    expect(html).toContain('沙箱已关闭')
+-    expect(html).toContain('恢复沙箱')
+-    expect(html).not.toContain('临时解锁（不安全）')
+   })
+
+   it('markdown preview keeps rendering markdown, not an iframe', () => {
+@@ -127,22 +90,18 @@ describe('changes tab HTML render preview sandbox', () => {
+     }
+   }
+
+-  it('render iframe is ALWAYS sandboxed (no escape hatch) with the route src, never srcdoc', () => {
+-    const html = renderToString(createElement(HtmlRenderPreview, { src: '/sidebar/html/s1/p/a/index.html', title: '/p/a/index.html' }))
+-    const iframe = /<iframe[^>]*>/.exec(html)?.[0]
+-    expect(iframe).toBeDefined()
+-    // The sandbox tokens are exactly the shared constant — and unlike the
+-    // editor viewer this surface has NO no-sandbox escape hatch.
+-    expect(iframe).toContain(`sandbox="${HTML_IFRAME_SANDBOX}"`)
++  it('neither preview surface exposes a sandbox escape hatch any more', () => {
++    // The escape hatch is GONE in this build, and the test pins the absence
++    // rather than the old warned-unlock path: the editor viewer's settings
++    // row no longer offers it, and the HTML viewer descriptor declares none.
++    const editorHtml = renderToString(createElement(TextEditor, viewerProps(createSidebarStore(), {
++      path: '/p/a/index.html',
++    })))
++    expect(editorHtml).not.toContain('沙箱')
++    expect(editorHtml).not.toContain('解锁')
++    // The sandbox constant itself stays exactly as narrow as before.
+     expect(HTML_IFRAME_SANDBOX).not.toContain('allow-same-origin')
+     expect(HTML_IFRAME_SANDBOX).not.toContain('allow-top-navigation')
+-    // Cross-origin framing by construction: route-src (never srcdoc). The src
+-    // here is the caller's literal (DiffPane passes htmlUrl(...)); this surface
+-    // only frames what it is given.
+-    expect(iframe).toContain('src="/sidebar/html/s1/p/a/index.html"')
+-    expect(iframe).not.toContain('srcdoc=')
+-    expect(iframe).toContain('referrerPolicy="no-referrer"')
+-    expect(iframe).toContain('allow=""')
+   })
+
+   it('html op targets show the render toggle (off by default, no iframe); non-html and error targets show none', () => {
