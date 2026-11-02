@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # GitHub Actions 已锁 commit SHA（供应链加固），由 dependabot 每周自动
+  # 跟进新版本并更新 SHA 与末尾 `# vX` 注释，避免 SHA 过期漂移。
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - ci

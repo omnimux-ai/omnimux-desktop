@@ -1,0 +1,328 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        type: choice
+        options: [mac, win, both]
+        default: 'both'
+      skip_cdn:
+        description: 'Publish the GitHub Release only, leaving dl.omnimux.ai on the previous build (no CDN update, no auto-update for installed clients)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DSH_TELEMETRY_DISABLED: '1'
+
+jobs:
+  build-mac:
+    if: ${{ inputs.platform == 'mac' || inputs.platform == 'both' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Verify version consistency
+        run: node scripts/verify-version.mjs
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+      # Next resolves its product plugins as ordinary npm dependencies, so there is no
+      # preset tree to stage. `stage:preset` belongs to the old shell and reads a plugin
+      # lifecycle registry Next never produces.
+      - name: Import Developer ID certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # Decode the base64 .p12 and import it into a temporary keychain so
+          # codesign can find the identity without touching the login keychain.
+          echo "$APPLE_CERTIFICATE" | base64 --decode > developerID_application.p12
+          security create-keychain -p "github-actions" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "github-actions" build.keychain
+          security import developerID_application.p12 -k build.keychain \
+            -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "github-actions" build.keychain
+          security find-identity -v build.keychain
+      - name: Build macOS release (arm64 DMG, signed + notarized)
+        env:
+          CSC_NAME: 'Yuhang Zhong (XXK6GHRZ44)'
+          DSH_MAC_RELEASE_ARCH: arm64
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: corepack yarn workspace dsh-desktop-next dist:mac
+      - name: Notarize macOS arm64 DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          dmg_path="$(find dsh-desktop-next/dist/mac-release -name 'OmniMux-*-arm64.dmg' | head -1)"
+          if [ -z "$dmg_path" ]; then
+            echo "::error::arm64 DMG not found for notarization"
+            exit 1
+          fi
+          xcrun notarytool submit "$dmg_path" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --wait --timeout 7200
+          xcrun stapler staple "$dmg_path"
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: OmniMux-mac-arm64
+          path: |
+            dsh-desktop-next/dist/mac-release/*arm64*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  build-mac-x64:
+    if: ${{ inputs.platform == 'mac' || inputs.platform == 'both' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Verify version consistency
+        run: node scripts/verify-version.mjs
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+      - name: Import Developer ID certificate
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > developerID_application.p12
+          security create-keychain -p "github-actions" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "github-actions" build.keychain
+          security import developerID_application.p12 -k build.keychain \
+            -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "github-actions" build.keychain
+          security find-identity -v build.keychain
+      - name: Build macOS release (x64 DMG, signed + notarized)
+        env:
+          CSC_NAME: 'Yuhang Zhong (XXK6GHRZ44)'
+          DSH_MAC_RELEASE_ARCH: x64
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: corepack yarn workspace dsh-desktop-next dist:mac
+      - name: Notarize macOS x64 DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          dmg_path="$(find dsh-desktop-next/dist/mac-release -name 'OmniMux-*-x64.dmg' | head -1)"
+          if [ -z "$dmg_path" ]; then
+            echo "::error::x64 DMG not found for notarization"
+            exit 1
+          fi
+          xcrun notarytool submit "$dmg_path" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --wait --timeout 7200
+          xcrun stapler staple "$dmg_path"
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: OmniMux-mac-x64
+          path: |
+            dsh-desktop-next/dist/mac-release/*x64*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  build-win:
+    if: ${{ inputs.platform == 'win' || inputs.platform == 'both' }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Verify version consistency
+        run: node scripts/verify-version.mjs
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+      # Same as the macOS job: Next has no preset tree to stage.
+      - name: Build Windows installer (website unsigned)
+        run: corepack yarn workspace dsh-desktop-next dist:win
+      - name: Verify Windows installer
+        run: corepack yarn workspace dsh-desktop-next check:win-package
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
+        with:
+          name: OmniMux-win
+          path: |
+            dsh-desktop-next/dist/OmniMux-*.exe
+            dsh-desktop-next/dist/OmniMux-*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  # 发布到 GitHub Releases：把产物从 14 天临时 artifact 升级为持久、可追溯的
+  # 分发资产，同时是 electron-updater 自动更新链路的 feed 地基。
+  # 当前决策：Windows 以官网 unsigned NSIS 为主；Microsoft Store / Trusted Signing
+  # 付费签名路径暂停，见 docs/contracts/release-sop.md。
+  publish:
+    needs: [build-mac, build-win]
+    if: ${{ always() && (needs.build-mac.result == 'success' || needs.build-win.result == 'success') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+      # The market catalog images are uploaded from the public plugin repository.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+        with:
+          repository: omnimux-ai/omnimux-dsh
+          ref: main
+          path: omni-source
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+      - name: Download build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Resolve version
+        id: version
+        run: |
+          # The tag must name what was actually built. Both build jobs package
+          # dsh-desktop-next, so the Next manifest is the release version; the
+          # root manifest still carries the retired shell (2.0.18) and using it
+          # produced a tag that already existed and a version no artifact
+          # matched (same root cause as the archive path in #126).
+          next_version="$(node -p "require('./dsh-desktop-next/package.json').version")"
+          tag="v${next_version}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
+          echo "Resolved release tag ${tag} from dsh-desktop-next/package.json"
+      # The desktop updaters poll a fixed per-channel object beside the installers.
+      # Generate it before publishing so the channel object and the installers land
+      # in the same upload.
+      #
+      # One call, for the version actually built: the script derives the channel
+      # from the prerelease tag (2.0.20-next -> version-next.json, 2.0.18 ->
+      # version-stable.json). Generating the stable object from the root manifest
+      # advertised 2.0.18 while the served bytes were the 2.0.20-next build — a
+      # stable client would have been told to download a version it did not get.
+      - name: Generate release metadata
+        run: |
+          node scripts/build-release-metadata.mjs \
+            --version "${{ steps.version.outputs.next_version }}" \
+            --dir release-assets
+      # Plugins ship independently of the application, so the market index is a
+      # released object of its own rather than something baked into the build.
+      - name: Generate plugin index
+        run: node scripts/build-plugin-index.mjs
+      # The installer carries whatever plugin versions the lockfile pinned, and
+      # nothing else says which. Write that beside the binaries so a release
+      # answers "what code is in this build" without re-deriving it.
+      - name: Generate plugin provenance
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          RELEASE_VERSION: ${{ steps.version.outputs.next_version }}
+        run: node scripts/build-plugin-provenance.mjs --out release-assets
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: OmniMux ${{ steps.version.outputs.tag }}
+          files: |
+            release-assets/**/*.dmg
+            release-assets/**/*.exe
+            release-assets/**/*.zip
+            release-assets/plugin-provenance.json
+          fail_on_unmatched_files: false
+      - name: Sync to Cloudflare R2 (dl.omnimux.ai)
+        if: ${{ !inputs.skip_cdn }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Missing credentials are a FAILURE, not a warning (issue #127): the
+          # landing page and the in-app updater both read dl.omnimux.ai, so a
+          # green release with an empty CDN leaves every user on the previous
+          # build with nobody notified. An intentional CDN-less publish sets the
+          # skip_cdn input instead of relying on the secrets being absent.
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are required to publish."
+            echo "dl.omnimux.ai would stay on the previous build while this release reports success."
+            echo "Set both repository secrets, or re-run with the skip_cdn input to publish the GitHub Release only."
+            exit 1
+          fi
+          node scripts/r2-dist-sync.mjs upload --dir release-assets
+      # The market plugin ships code only; its catalog images live here. Upload them in
+      # the same release when the source tree includes them so a fresh install never hits a missing cover.
+      - name: Sync market catalog assets to R2
+        if: ${{ !inputs.skip_cdn }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -d "omni-source/plugins/omnimux-market/catalog" ]; then
+            node scripts/upload-market-assets.mjs --dir omni-source/plugins/omnimux-market/catalog
+          else
+            echo "omni-source/plugins/omnimux-market/catalog not present in plugins-source branch; skipping cover sync."
+          fi
+      # Confirm what users will actually download, and that the version archive a
+      # rollback depends on exists (issues #126 and #127). This runs after the
+      # upload, so it validates the live CDN rather than the intent.
+      - name: Verify the published CDN
+        if: ${{ !inputs.skip_cdn }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # The archive is keyed by the version the ARTIFACT carries, which is the
+          # Next build's version, not this repo's root manifest.
+          artifact_version="$(node -p "require('./dsh-desktop-next/package.json').version")"
+          node scripts/r2-dist-sync.mjs verify --version "$artifact_version"
+      # An explicit CDN-less publish still has to say so out loud, otherwise the
+      # job looks identical to a full release.
+      - name: Report an intentionally CDN-less publish
+        if: ${{ inputs.skip_cdn }}
+        run: |
+          echo "::warning::skip_cdn was set: the GitHub Release is published but dl.omnimux.ai was NOT updated."
+          echo "Landing-page downloads and in-app auto-update still point at the previous build."

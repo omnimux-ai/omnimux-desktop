@@ -1,0 +1,41 @@
+.DS_Store
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+node_modules
+*.tsbuildinfo
+.build/
+
+dsh-plugin-desktop/dist/
+dsh-plugin-desktop/lib/
+dsh-community-market/lib/
+
+.env.yarn
+# filter-branch leftovers and local build/download artifacts
+.git-rewrite/
+dsh-plugin-desktop/dist/
+
+# 根目录发布/下载产物（.app 备份、本地分发缓存），勿提交
+/dist/
+/index.js
+.workbuddy/
+dsh-plugin-desktop/preset/plugins/
+dsh-plugin-desktop/preset/agent-presets/
+dsh-plugin-desktop/preset/skills/
+# Derived per stage run: one digest per staged package. It travels inside the
+# built package, where `verify-distribution` reads it back; a committed copy
+# would only churn on every plugin edit.
+dsh-plugin-desktop/preset/distribution.json
+
+# Agent parallel worktrees (one branch per checkout)
+.worktrees/
+
+# Upstream Next build outputs (OmniMux keeps the Next package in-tree, grey-box)
+dsh-desktop-next/lib/
+dsh-desktop-next/dist/
+dsh-desktop-next/.desktop-next/
+dsh-desktop-next/.desktop-build/
+dsh-plugin-desktop/.desktop-build/
