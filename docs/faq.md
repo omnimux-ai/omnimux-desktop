@@ -1,16 +1,18 @@
-# DSH Desktop 常见问题
+# OmniMux Desktop 常见问题
 
 [English](faq.en.md)
 
-本页回答当前正式版本最常见的安装、平台、运行环境和插件问题。功能范围以[最新 GitHub Release](https://github.com/anywhere-labs/deepseek-harness-desktop/releases/latest)和[用户指南](user-guide.md)为准。
+本页回答当前正式版本最常见的安装、平台、运行环境和插件问题。功能范围以[官方下载源](https://dl.omnimux.ai)、[最新 GitHub Release](https://github.com/omnimux-ai/omnimux-desktop/releases/latest)和[用户指南](user-guide.md)为准。
 
-## DSH Desktop 是什么？
+## OmniMux Desktop / DSH Desktop 是什么？
 
-DSH Desktop 是面向 Windows 和 macOS 的开源 DeepSeek Harness 桌面客户端。它把官方 Harness 的本地 Web UI、Host 服务和插件系统装进原生桌面应用，并提供窗口、系统托盘、终端、更新和 profile 管理。
+OmniMux Desktop 是面向内容电商卖家与创作者的原生桌面工作台（支持 Windows x64 和 macOS Universal），核心定位为**「属于你的内容电商团队 — 一套内容电商系统，让商品卖点贯穿每一次出片。用你熟悉的 Agent，一站式搞定广告、电商与种草视频」**。
+
+在架构上，它基于开源的 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)、[DSH Desktop](https://github.com/anywhere-labs/deepseek-harness-desktop) 与 [Cordis](https://github.com/cordiverse/cordis) 插件系统构建，把官方 Harness 的本地 Web UI、Host 服务与 OmniMux 内容电商插件套件（商品与资产库、爆款灵感拆解、无限画布工作流、时间轴视频剪辑、多平台排期与发布中心）装进原生桌面应用，并提供窗口、系统托盘、终端、更新和 profile 管理。
 
 ## 这是 DeepSeek 官方产品吗？
 
-不是。DSH Desktop 是社区维护的独立开源项目，不隶属于 DeepSeek，也未获得 DeepSeek 官方背书。项目名称仅用于说明它与官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的技术关系。
+不是。OmniMux Desktop 与上游 DSH Desktop 均是社区及独立团队维护的开源项目，不隶属于深度求索（DeepSeek），也未获得 DeepSeek 官方背书。文中提及“DeepSeek Harness”仅用于说明它与官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的技术兼容性与上游关系。
 
 ## 支持哪些操作系统？
 
@@ -64,4 +66,4 @@ Desktop Host、profile 和 DSH home 位于本机。是否向外部服务发送�
 - Windows：[`OmniMux-Setup.exe`](https://dl.omnimux.ai/releases/latest/OmniMux-Setup.exe)
 - macOS：[`OmniMux-universal.dmg`](https://dl.omnimux.ai/releases/latest/OmniMux-universal.dmg)
 
-下载页规范见 [`contracts/download-page-spec.md`](contracts/download-page-spec.md)。GitHub Release 仅作次要镜像。遇到问题时先查看[用户指南的排查部分](user-guide.md#排查)，仍无法解决再提交 [GitHub Issue](https://github.com/anywhere-labs/deepseek-harness-desktop/issues/new/choose)，并附上操作系统、应用版本、复现步骤和错误信息。
+下载页规范见 [`contracts/download-page-spec.md`](contracts/download-page-spec.md)。GitHub Release 仅作次要镜像。遇到问题时先查看[用户指南的排查部分](user-guide.md#排查)，仍无法解决再提交 [GitHub Issue](https://github.com/omnimux-ai/omnimux-desktop/issues/new/choose)，并附上操作系统、应用版本、复现步骤和错误信息。

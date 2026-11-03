@@ -1,16 +1,18 @@
-# DSH Desktop FAQ
+# OmniMux Desktop FAQ
 
 [中文](faq.md)
 
-This page answers common questions about installation, supported platforms, the bundled runtime, and plugins in the current stable release. The [latest GitHub Release](https://github.com/anywhere-labs/deepseek-harness-desktop/releases/latest) and [user guide](user-guide.en.md) define the shipped product scope.
+This page answers common questions about installation, supported platforms, the bundled runtime, and plugins in the current stable release. The [official download CDN](https://dl.omnimux.ai), [latest GitHub Release](https://github.com/omnimux-ai/omnimux-desktop/releases/latest), and [user guide](user-guide.en.md) define the shipped product scope.
 
-## What is DSH Desktop?
+## What is OmniMux Desktop / DSH Desktop?
 
-DSH Desktop is an open-source DeepSeek Harness desktop client for Windows and macOS. It packages the official Harness local Web UI, Host service, and plugin system into a native desktop application with a window, system tray, terminal, updates, and profile management.
+OmniMux Desktop is a native desktop workbench for content commerce sellers and creators on Windows x64 and macOS Universal, built as **Your Content Commerce Team — One content commerce system that carries your product's selling points through every video. Use the Agents you already know to create ads, shoppable videos, and product reviews—all in one place.**
+
+Under the hood, it is built on the open-source [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), [DSH Desktop](https://github.com/anywhere-labs/deepseek-harness-desktop), and the [Cordis](https://github.com/cordiverse/cordis) plugin architecture. It packages the official Harness local Web UI, Host service, and the OmniMux content commerce plugin suite (product and persona asset libraries, viral video breakdown, infinite canvas workflows, timeline video editing, and multi-platform scheduling/publishing) into a native desktop application with a window, system tray, terminal, updates, and profile management.
 
 ## Is this an official DeepSeek product?
 
-No. DSH Desktop is an independent, community-maintained open-source project. It is not affiliated with or endorsed by DeepSeek. The name only describes its technical relationship with the official [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
+No. Both OmniMux Desktop and upstream DSH Desktop are independent open-source projects. Neither is affiliated with, authorized by, or endorsed by DeepSeek. References to "DeepSeek Harness" only describe technical compatibility and the relationship with the official [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
 
 ## Which operating systems are supported?
 
@@ -64,4 +66,4 @@ Download from the official CDN:
 - Windows: [`OmniMux-Setup.exe`](https://dl.omnimux.ai/releases/latest/OmniMux-Setup.exe)
 - macOS: [`OmniMux-universal.dmg`](https://dl.omnimux.ai/releases/latest/OmniMux-universal.dmg)
 
-See [`contracts/download-page-spec.md`](contracts/download-page-spec.md) for the download-page contract. GitHub Releases are a secondary mirror only. Check the [troubleshooting section](user-guide.en.md#troubleshooting) first. If the problem remains, open a [GitHub Issue](https://github.com/anywhere-labs/deepseek-harness-desktop/issues/new/choose) with the operating system, app version, reproduction steps, and error details.
+See [`contracts/download-page-spec.md`](contracts/download-page-spec.md) for the download-page contract. GitHub Releases are a secondary mirror only. Check the [troubleshooting section](user-guide.en.md#troubleshooting) first. If the problem remains, open a [GitHub Issue](https://github.com/omnimux-ai/omnimux-desktop/issues/new/choose) with the operating system, app version, reproduction steps, and error details.

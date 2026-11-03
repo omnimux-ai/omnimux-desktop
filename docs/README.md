@@ -1,8 +1,8 @@
-# DSH Desktop 文档
+# OmniMux Desktop 文档
 
 [English documentation](README.en.md)
 
-这里是 DSH Desktop 的产品与开发文档入口。根目录的 [`README.md`](../README.md) 适合第一次了解项目；本目录解释项目为什么存在、如何使用，以及如何为 Desktop 编写插件。想参与贡献？见[参与贡献](../CONTRIBUTING.md)。
+这里是 OmniMux Desktop（「属于你的内容电商团队」桌面端）的产品与插件开发文档入口。根目录的 [`README.md`](../README.md) 适合第一次了解项目；本目录解释项目为什么存在、如何使用，以及如何基于 DeepSeek Harness 与 Cordis 插件体系为 Desktop 编写和扩展插件。想参与贡献？见[参与贡献](../CONTRIBUTING.md)。
 
 ## 按目标阅读
 
