@@ -106,6 +106,8 @@ function walkExecutables(dir: string): string[] {
 /** Check whether a file is a universal Mach-O binary (contains both x86_64 and arm64). */
 function isUniversalMachO(file: string): boolean {
   try {
+    const fileType = execFileSync('file', ['-b', file], { encoding: 'utf8' })
+    if (!fileType.includes('Mach-O')) return false
     const out = execFileSync('lipo', ['-info', file], { encoding: 'utf8' })
     return out.includes('x86_64') && out.includes('arm64')
   } catch { return false }
