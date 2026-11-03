@@ -789,6 +789,8 @@
     "omnimux:stage": "node scripts/omnimux.mjs stage",
     "omnimux:verify": "node scripts/omnimux.mjs verify",
     "omnimux:path": "node scripts/omnimux.mjs path",
+    "omnimux:prod-reset": "bash scripts/omnimux-prod-reset.sh",
+    "omnimux:prod-reset:yes": "bash scripts/omnimux-prod-reset.sh --yes",
     "package:dir:next": "yarn aa:prepare-release && yarn workspace dsh-community-market build && yarn workspace dsh-desktop-next package:dir",
     "dist:mac:next": "yarn aa:prepare-release && yarn workspace dsh-community-market build && yarn workspace dsh-desktop-next dist:mac",
     "dist:mac-arm64:next": "yarn aa:prepare-release && yarn workspace dsh-community-market build && DSH_MAC_RELEASE_ARCH=arm64 yarn workspace dsh-desktop-next dist:mac",
@@ -799,5 +801,5 @@
     "check:next": "yarn workspace dsh-desktop-next check",
     "market:prepare": "node scripts/prepare-dsh-market.mjs"
   },
-  "version": "2.0.21"
+  "version": "2.0.22"
 }
