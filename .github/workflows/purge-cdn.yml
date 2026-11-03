@@ -1,0 +1,48 @@
+name: Purge CDN
+
+# R2 源站换内容不会自动清掉 Cloudflare 边缘缓存，`releases/latest/*` 会在缓存过期前
+# 继续把上一个版本的字节发给用户和发布校验步骤。发布后按需手动清理一次。
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version to purge (also purges releases/v<version>/*); leave empty for latest aliases only'
+        required: false
+        type: string
+      everything:
+        description: 'Purge the whole zone cache'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: purge-cdn
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Purge CDN cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN is required to purge the CDN cache."
+            exit 1
+          fi
+          args=()
+          if [ -n "${{ inputs.version }}" ]; then args+=(--version "${{ inputs.version }}"); fi
+          if [ "${{ inputs.everything }}" = "true" ]; then args+=(--everything); fi
+          node scripts/cf-purge-cache.mjs "${args[@]}"
