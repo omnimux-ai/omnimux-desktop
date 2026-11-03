@@ -50,6 +50,8 @@ jobs:
         # runner refreshes it in place instead of failing the build.
       - name: Refresh Agents Anywhere vendor
         run: corepack yarn aa:prepare-release
+      - name: Refresh dshmarket package versions
+        run: corepack yarn market:prepare
       # Next resolves its product plugins as ordinary npm dependencies, so there is no
       # preset tree to stage. `stage:preset` belongs to the old shell and reads a plugin
       # lifecycle registry Next never produces.
@@ -126,6 +128,8 @@ jobs:
         # runner refreshes it in place instead of failing the build.
       - name: Refresh Agents Anywhere vendor
         run: corepack yarn aa:prepare-release
+      - name: Refresh dshmarket package versions
+        run: corepack yarn market:prepare
       - name: Import Developer ID certificate
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -196,6 +200,8 @@ jobs:
         # runner refreshes it in place instead of failing the build.
       - name: Refresh Agents Anywhere vendor
         run: corepack yarn aa:prepare-release
+      - name: Refresh dshmarket package versions
+        run: corepack yarn market:prepare
       # Same as the macOS job: Next has no preset tree to stage.
       - name: Build Windows installer (website unsigned)
         run: corepack yarn workspace dsh-desktop-next dist:win
