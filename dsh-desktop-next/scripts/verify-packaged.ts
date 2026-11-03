@@ -1,6 +1,7 @@
 /** Cross-check the assembled `app.asar` payload against the prepared tree before signing, without a GUI. */
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { execFileSync } from 'node:child_process'
 import { archivedPayload, auditNextPayload, nextPackagingTarget, PAYLOAD_DIR, verifyArchiveAgainstPrepared, verifyNextPayload, verifyUpdaterManifestShim } from './packaged-payload.ts'
 import { expectedNextVersion, verifyNextRuntimeTree } from './prepare-runtime.ts'
 import { DESKTOP_RUNTIME_FILE } from '../src/runtime-tree.ts'
@@ -55,6 +56,57 @@ export default async function afterPack(context: PackContext): Promise<void> {
   } finally { source.close() }
   const runtimes = packagingStepSync('runtime:verify-packaged', () => verifyNextRuntimeTree(join(resources, 'runtime'), platform, expectedNextVersion(context.packager.projectDir)))
   for (const runtime of runtimes) console.log(`Verified the ${runtime.arch} primary runtime: Python ${runtime.manifest.python}, Node ${runtime.manifest.node}, pnpm ${runtime.manifest.pnpm}`)
+  // Thin any universal (fat) Mach-O binaries to the target architecture.
+  // Upstream deps (@trycua, lxml, etc.) ship universal binaries that trigger
+  // Gatekeeper's Rosetta warning on Apple Silicon when only arm64 is needed.
+  if (platform === 'darwin') {
+    const targetArch = context.appOutDir.endsWith('-arm64') ? 'arm64' : 'x86_64'
+    const thinned = packagingStepSync('thin:universal-binaries', () => thinUniversalBinaries(resources, targetArch))
+    if (thinned.length > 0) console.log(`Thinned ${thinned.length} universal binary(ies) to ${targetArch}: ${thinned.join(', ')}`)
+  }
   verifiedPackagedResources.add(resolve(resources))
   await Promise.resolve()
+}
+
+/**
+ * Scan `app.asar.unpacked` and `runtime/` for universal Mach-O binaries and
+ * `lipo -thin` them to the target architecture.  A universal binary contains
+ * both x86_64 and arm64 slices; on a single-arch package it triggers a
+ * Gatekeeper "install Rosetta" prompt.  Returns the relative paths thinned.
+ * @param resources - `Contents/Resources` inside the staged .app bundle.
+ * @param targetArch - `arm64` or `x86_64` matching `context.appOutDir`.
+ */
+function thinUniversalBinaries(resources: string, targetArch: 'arm64' | 'x86_64'): string[] {
+  const thinned: string[] = []
+  const dirs = [join(resources, 'app.asar.unpacked'), join(resources, 'runtime')]
+  for (const dir of dirs) {
+    if (!existsSync(dir)) continue
+    for (const entry of walkExecutables(dir)) {
+      const file = join(dir, entry)
+      if (!isUniversalMachO(file)) continue
+      execFileSync('lipo', [file, '-thin', targetArch, '-output', file])
+      thinned.push(entry)
+    }
+  }
+  return thinned
+}
+
+/** Recursively collect executable files under a directory, relative to it. */
+function walkExecutables(dir: string): string[] {
+  const entries: string[] = []
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name)
+    const stat = statSync(full)
+    if (stat.isDirectory()) entries.push(...walkExecutables(full).map(e => `${name}/${e}`))
+    else if ((stat.mode & 0o111) !== 0) entries.push(name)
+  }
+  return entries
+}
+
+/** Check whether a file is a universal Mach-O binary (contains both x86_64 and arm64). */
+function isUniversalMachO(file: string): boolean {
+  try {
+    const out = execFileSync('lipo', ['-info', file], { encoding: 'utf8' })
+    return out.includes('x86_64') && out.includes('arm64')
+  } catch { return false }
 }
