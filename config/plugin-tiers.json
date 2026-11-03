@@ -6,22 +6,21 @@
       "dsh-better-sidebar"
     ],
     "preview": [
-      "omnimux",
+      "omnimux"
+    ],
+    "beta": [],
+    "retired": [
       "omnimux-assets",
       "omnimux-clip",
       "omnimux-forms",
       "omnimux-inspiration",
       "omnimux-market",
       "omnimux-products",
-      "omnimux-workflow"
-    ],
-    "beta": [
+      "omnimux-workflow",
       "omnimux-accounts",
       "omnimux-analytics",
       "omnimux-publish",
-      "omnimux-video"
-    ],
-    "retired": [
+      "omnimux-video",
       "omnimux-automation"
     ]
   }
