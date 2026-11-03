@@ -9,6 +9,10 @@ on:
         description: 'Release version to purge (also purges releases/v<version>/*); leave empty for latest aliases only'
         required: false
         type: string
+      zone_id:
+        description: 'Cloudflare zone id (only needed when the token cannot list zones)'
+        required: false
+        type: string
       everything:
         description: 'Purge the whole zone cache'
         required: false
@@ -36,7 +40,7 @@ jobs:
       - name: Purge CDN cache
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID || inputs.zone_id }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::error::CLOUDFLARE_API_TOKEN is required to purge the CDN cache."
