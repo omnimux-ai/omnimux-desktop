@@ -83,12 +83,17 @@ async function verifyFinalArtifacts(result: { outDir: string }): Promise<string[
       const runtimes = verifyNextRuntimeTree(join(resources, 'runtime'), target.platform, expectedVersion)
       if (runtimes.length > 0) console.log(`Verified the bundled primary runtimes: ${runtimes.map(runtime => runtime.arch).join(', ')}`)
     }
+    let translatedSlice = false
     if (darwin) {
       const slices = machOArchitectures(path)
       if (!slices.includes(process.arch) && !(process.arch === 'arm64' && slices.includes('x64') && rosettaAvailable())) {
         console.log(`Skipping packaged Node execution smoke for ${path} (${slices.join('/')}): this ${process.platform} ${process.arch} host cannot execute it`)
         continue
       }
+      // A slice the host cannot run natively executes through Rosetta, where the same
+      // import graph takes several times longer — and the four smokes below share the
+      // runner's cores, so the native budget expires before the work finishes.
+      translatedSlice = !slices.includes(process.arch)
     }
     await Promise.all([
       // Electron's Node mode reads the archive like a directory, as the Host and CLI will.
@@ -101,7 +106,7 @@ async function verifyFinalArtifacts(result: { outDir: string }): Promise<string[
         await import(pathToFileURL(root + '/lib/profiles.js'));
         await import(pathToFileURL(root + '/lib/desktop-runtime.js'));
         require.resolve('@deepseek-ai/dsh-web-frontend/dist/index.html');
-      `, root], 30_000, 'Packaged Next runtime failed'),
+      `, root], translatedSlice ? 180_000 : 30_000, 'Packaged Next runtime failed'),
       // The native computer-use driver opens its library with the system loader; the Host's resolver must answer with the unpacked copy.
       runPackagedNode(path, [join(desktopRoot, 'scripts', 'packaged-driver-smoke.mjs'), root], 120_000, 'Packaged computer-use driver smoke failed'),
       // The badge skill announces its asset directory to the model; the Host's resolver must make it physical.

@@ -334,9 +334,24 @@ jobs:
           else
             echo "omni-source/plugins/omnimux-market/catalog not present in plugins-source branch; skipping cover sync."
           fi
+      # R2 stores the new bytes immediately, but Cloudflare keeps serving the previous
+      # object for `releases/latest/*` until that cache entry expires or is purged. The
+      # in-app updater and the download links both read those aliases, so a release that
+      # skips the purge leaves every client on the old build with a hash mismatch.
+      - name: Purge the CDN cache for release aliases
+        if: ${{ !inputs.skip_cdn }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          artifact_version="$(node -p "require('./dsh-desktop-next/package.json').version")"
+          if ! node scripts/cf-purge-cache.mjs --version "$artifact_version"; then
+            echo "::error::CDN cache purge failed. CLOUDFLARE_API_TOKEN needs Zone → Cache Purge (plus Zone → Read, or set CLOUDFLARE_ZONE_ID). Until it succeeds dl.omnimux.ai/releases/latest/* keeps serving the previous build."
+            exit 1
+          fi
       # Confirm what users will actually download, and that the version archive a
       # rollback depends on exists (issues #126 and #127). This runs after the
-      # upload, so it validates the live CDN rather than the intent.
+      # upload and the purge, so it validates the live CDN rather than the intent.
       - name: Verify the published CDN
         if: ${{ !inputs.skip_cdn }}
         env:
