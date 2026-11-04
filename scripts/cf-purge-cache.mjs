@@ -11,9 +11,9 @@
  *   node scripts/cf-purge-cache.mjs --everything
  *
  * 环境变量:
- *   CLOUDFLARE_API_TOKEN  （必需，需要 Zone 的 Cache Purge 权限）
- *   CLOUDFLARE_ZONE_ID    （可选；缺省时按 CDN 域名反查）
- *   OMNIMUX_DIST_BASE_URL （可选；默认 https://dl.omnimux.ai）
+ *   CLOUDFLARE_PURGE_TOKEN （必需，Zone 的 Cache Purge 权限；发布用的 R2 Token 无权清缓存）
+ *   CLOUDFLARE_ZONE_ID     （可选；缺省时按 CDN 域名反查，反查需要 Zone Read 权限）
+ *   OMNIMUX_DIST_BASE_URL  （可选；默认 https://dl.omnimux.ai）
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -26,6 +26,8 @@ const PURGE_BATCH_SIZE = 30
 
 /** 读取 Cloudflare 鉴权 Token，保持与 r2-dist-sync.mjs 相同的解析顺序。 */
 function resolveCloudflareToken() {
+  // The R2 upload token cannot purge zone cache, so the dedicated purge token wins when present.
+  if (process.env.CLOUDFLARE_PURGE_TOKEN) return process.env.CLOUDFLARE_PURGE_TOKEN
   if (process.env.CLOUDFLARE_API_TOKEN) return process.env.CLOUDFLARE_API_TOKEN
   if (process.env.CF_TOKEN) return process.env.CF_TOKEN
 

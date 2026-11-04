@@ -39,11 +39,11 @@ jobs:
           node-version: 22.23.2
       - name: Purge CDN cache
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID || inputs.zone_id }}
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::CLOUDFLARE_API_TOKEN is required to purge the CDN cache."
+          if [ -z "$CLOUDFLARE_PURGE_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_PURGE_TOKEN (Zone → Cache Purge) is required to purge the CDN cache."
             exit 1
           fi
           args=()

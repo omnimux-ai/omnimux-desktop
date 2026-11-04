@@ -341,12 +341,12 @@ jobs:
       - name: Purge the CDN cache for release aliases
         if: ${{ !inputs.skip_cdn }}
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PURGE_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
         run: |
           artifact_version="$(node -p "require('./dsh-desktop-next/package.json').version")"
           if ! node scripts/cf-purge-cache.mjs --version "$artifact_version"; then
-            echo "::error::CDN cache purge failed. CLOUDFLARE_API_TOKEN needs Zone → Cache Purge (plus Zone → Read, or set CLOUDFLARE_ZONE_ID). Until it succeeds dl.omnimux.ai/releases/latest/* keeps serving the previous build."
+            echo "::error::CDN cache purge failed. Set CLOUDFLARE_PURGE_TOKEN (Zone → Cache Purge) and CLOUDFLARE_ZONE_ID. Until it succeeds dl.omnimux.ai/releases/latest/* keeps serving the previous build."
             exit 1
           fi
       # Confirm what users will actually download, and that the version archive a
