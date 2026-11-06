@@ -1,8 +1,7 @@
 diff --git a/client/client.js b/client/client.js
-index f353c83..dabc761 100644
 --- a/client/client.js
 +++ b/client/client.js
-@@ -12498,7 +12498,7 @@ window.__ModuleLoader__.load({ id: "dshmarket", factory: (require) => {
+@@ -13323,7 +13323,7 @@
  					return next;
  				});
  			}, []);
@@ -11,20 +10,19 @@ index f353c83..dabc761 100644
  			const updatableNames = Object.keys(installed).filter((name) => name !== selfName && !effectiveDisabledSet.has(name) && isPluginUpdatable(name, String(installed[name]), updates[name], updatedNames));
  			const batchUpdatableNames = updatableNames.filter((name) => updates[name]?.restoreRequired !== true);
  			const ignoredUpdateSet = (0, react.useMemo)(() => new Set(ignoredUpdateNames), [ignoredUpdateNames]);
-@@ -13898,7 +13898,7 @@ window.__ModuleLoader__.load({ id: "dshmarket", factory: (require) => {
- 											children: exportState === "busy" ? t("exportingLog") : t("exportLog")
- 										}),
- 										(() => {
--											const self = installed["dshmarket"] !== void 0 ? "dshmarket" : "dsh-market";
-+											const self = installed["dshmarket"] !== void 0 || updates["dshmarket"] !== void 0 ? "dshmarket" : "dsh-market";
- 											const status = updates[self];
- 											return status && status.updateAvailable && !updatedNames.includes(self) && !quietUpdateSet.has(self) && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Button, {
- 												variant: "primary",
+@@ -14660,7 +14660,7 @@
+ 			]);
+ 			const batchActions = /* @__PURE__ */ (0, react_jsx_runtime.jsxs)(react_jsx_runtime.Fragment, { children: [
+ 				(() => {
+-					const self = installed["dshmarket"] !== void 0 ? "dshmarket" : "dsh-market";
++					const self = installed["dshmarket"] !== void 0 || updates["dshmarket"] !== void 0 ? "dshmarket" : "dsh-market";
+ 					const status = updates[self];
+ 					return status && status.updateAvailable && !updatedNames.includes(self) && !quietUpdateSet.has(self) && /* @__PURE__ */ (0, react_jsx_runtime.jsx)(_deepseek_ai_dsh_client_ui_primitives.Button, {
+ 						variant: "primary",
 diff --git a/lib/routes.js b/lib/routes.js
-index 071b7e1..a3dfab5 100644
 --- a/lib/routes.js
 +++ b/lib/routes.js
-@@ -1941,7 +1941,7 @@ export function mountMarketRoutes(host, config, commandRuntime, agentsLookup, ho
+@@ -2235,7 +2235,7 @@
          // unreleased work.
          const channel = activeChannel();
          const installed = readInstalled(config.profile, activeProfileDir);
@@ -33,7 +31,7 @@ index 071b7e1..a3dfab5 100644
              .filter(name => SELF_NAMES.has(name))
              .map(name => [name, channel]));
          const onlineSourceFor = new Map();
-@@ -2121,7 +2121,7 @@ export function mountMarketRoutes(host, config, commandRuntime, agentsLookup, ho
+@@ -2419,7 +2419,7 @@
                  }
                  try {
                      const { channelFor, onlineSourceFor, catalogNpmByRepo } = await updateCheckInputs();
@@ -42,7 +40,7 @@ index 071b7e1..a3dfab5 100644
                      // `packages` carries the same objects the single-package endpoint
                      // returns, so one parser serves both. Only updatable ones: a badge
                      // wants the count, a panel wants the rows, and neither wants to
-@@ -3883,7 +3883,7 @@ export function mountMarketRoutes(host, config, commandRuntime, agentsLookup, ho
+@@ -4386,7 +4386,7 @@
                      catch (error) {
                          logEvent('warn', 'updates', `package source lookup failed — ${error instanceof Error ? error.message : String(error)}`);
                      }
@@ -52,10 +50,9 @@ index 071b7e1..a3dfab5 100644
                          const status = updates[name];
                          if (status !== undefined)
 diff --git a/lib/updates.js b/lib/updates.js
-index 36cf538..63b36f7 100644
 --- a/lib/updates.js
 +++ b/lib/updates.js
-@@ -716,7 +716,7 @@ catalogNpmByRepo = new Map(),
+@@ -729,7 +729,7 @@
   * with `--config.minimum-release-age=0` and CAN install a young release.
   * Hiding those on the CLI would suppress updates that work.
   */
@@ -64,7 +61,7 @@ index 36cf538..63b36f7 100644
      const activeProfileDir = profileDir(profile, explicitDir);
      // The channel is part of the key: switching to betas has to change the
      // answer immediately, and a cache keyed on the profile alone would serve
-@@ -726,12 +726,12 @@ options = {}) {
+@@ -739,12 +739,12 @@
      if (!force && updatesCache?.key === cacheKey && Date.now() < updatesCache.recheckAt) {
          return updatesCache.data;
      }
