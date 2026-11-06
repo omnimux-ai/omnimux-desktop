@@ -165,7 +165,7 @@
     "stage:preset": "node scripts/stage-preset-profile.ts"
   },
   "dependencies": {
-    "@agents-anywhere/dsh-bridge-next": "file:../vendor/agents-anywhere/agents-anywhere-dsh-bridge-next-2.1.0-desktop.c47b676f29be0.r7504932a.tgz",
+    "@agents-anywhere/dsh-bridge-next": "file:../vendor/agents-anywhere/agents-anywhere-dsh-bridge-next-2.2.0-desktop.ce339d91884b1.r7504932a.tgz",
     "@deepseek-ai/cordis": "4.0.5",
     "@deepseek-ai/cordis-plugin-group": "1.0.5",
     "@deepseek-ai/cordis-plugin-include": "1.0.10",
