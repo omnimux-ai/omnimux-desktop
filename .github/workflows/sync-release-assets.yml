@@ -1,0 +1,45 @@
+name: Sync Release Assets to R2
+
+# Re-publish an existing GitHub Release to the CDN without rebuilding.
+# Use when a release was created but the publish job failed midway (for example
+# an R2 multipart upload flake or a locally built supplementary DMG), so the
+# `releases/latest/*` aliases and api/desktop/version-*.json are stale.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the leading v (for example 2.0.22)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38  # v6
+        with:
+          node-version: 22.23.2
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p release-assets
+          gh release download "v${{ inputs.version }}" -R "${{ github.repository }}" -D release-assets --clobber
+          ls -lh release-assets
+      - name: Generate release metadata
+        run: node scripts/build-release-metadata.mjs --version "${{ inputs.version }}" --dir release-assets
+      - name: Sync to Cloudflare R2 (dl.omnimux.ai)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID are required to publish."
+            exit 1
+          fi
+          node scripts/r2-dist-sync.mjs upload --version "${{ inputs.version }}" --dir release-assets
